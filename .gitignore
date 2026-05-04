@@ -1,0 +1,31 @@
+# Système
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Sauvegardes / dumps PostgreSQL
+*.sql.bak
+*.dump
+*.tar
+pg_dump_*
+
+# Secrets / environnement
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Cache outils Python (pour les futurs imports CF/QUDT/WMO)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
