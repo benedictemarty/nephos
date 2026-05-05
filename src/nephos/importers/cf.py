@@ -140,7 +140,7 @@ class CFStandardNamesImporter(Importer):
             units_raw = cast("str | None", entry["canonical_units_raw"])
             cf_standard_name = cast("str", entry["cf_standard_name"])
 
-            outcome, concept_id = _upsert_concept(conn, uri, notation, version)
+            outcome, concept_id = _upsert_concept(conn, uri, notation, version, cf_source_id)
             if outcome == "created":
                 nb_creations += 1
             elif outcome == "skipped":
@@ -295,13 +295,18 @@ def _ensure_cf_scheme(conn: psycopg.Connection, scheme_uri: str) -> int:
 
 
 def _upsert_concept(
-    conn: psycopg.Connection, uri: str, notation: str, version: str
+    conn: psycopg.Connection,
+    uri: str,
+    notation: str,
+    version: str,
+    source_id: int,
 ) -> tuple[str, int]:
     """Crée ou met à jour un concept ; retourne (outcome, concept_id).
 
     `outcome` ∈ {"created", "updated", "skipped", "override"} :
-      - "created"   : nouvelle ligne insérée.
-      - "updated"   : ligne existante, `import_version` mise à jour.
+      - "created"   : nouvelle ligne insérée (avec ``import_source_id``).
+      - "updated"   : ligne existante, ``import_version`` et ``import_source_id``
+                      mis à jour.
       - "skipped"   : ligne existante, déjà à la bonne version.
       - "override"  : `has_local_override = TRUE`, on ne touche à rien.
     """
@@ -317,11 +322,11 @@ def _upsert_concept(
             cur.execute(
                 """
                 INSERT INTO vocab.concept
-                  (uri, notation, status, import_version, last_synced_at)
-                VALUES (%s, %s, 'approved', %s, now())
+                  (uri, notation, status, import_source_id, import_version, last_synced_at)
+                VALUES (%s, %s, 'approved', %s, %s, now())
                 RETURNING concept_id
                 """,
-                (uri, notation, version),
+                (uri, notation, source_id, version),
             )
             row = cur.fetchone()
             assert row is not None
@@ -337,9 +342,9 @@ def _upsert_concept(
             )
             return ("skipped", int(concept_id))
         cur.execute(
-            "UPDATE vocab.concept SET import_version = %s, last_synced_at = now() "
-            "WHERE concept_id = %s",
-            (version, concept_id),
+            "UPDATE vocab.concept SET import_source_id = %s, import_version = %s, "
+            "last_synced_at = now() WHERE concept_id = %s",
+            (source_id, version, concept_id),
         )
         return ("updated", int(concept_id))
 

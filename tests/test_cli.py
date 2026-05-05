@@ -21,10 +21,8 @@ def test_version_flag_prints_version() -> None:
     assert "nephos" in result.stdout.lower()
 
 
-def test_import_status_returns_placeholder() -> None:
-    result = runner.invoke(app, ["import", "status"])
-    assert result.exit_code == 0
-    assert "implémenté" in result.stdout.lower() or "implemente" in result.stdout.lower()
+# `nephos import status` est désormais implémenté (E4-09) et nécessite Postgres ;
+# il est couvert par tests/integration/test_cli_import_status.py.
 
 
 def test_db_apply_returns_placeholder() -> None:

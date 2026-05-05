@@ -75,11 +75,40 @@ def info() -> None:
 def import_status() -> None:
     """Affiche l'état de synchronisation de chaque source standard.
 
-    Implémentation complète : item E4-09 du backlog.
-    Pour l'instant, un SELECT sur la vue `gov.v_imports_status`
-    suffira (à ajouter quand E4-09 sera traité).
+    Lit la vue `gov.v_imports_status` qui agrège, par source d'import :
+    nombre de versions importées, dernier import, nombre de concepts
+    issus de cette source, et nombre d'overrides locaux.
     """
-    console.print("[yellow]Pas encore implémenté.[/yellow] Voir item E4-09 du backlog.")
+    from nephos.db import connect
+
+    with connect() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT source, source_nom, licence, nb_versions_importees, "
+            "derniere_import, nb_concepts, nb_overrides_locaux "
+            "FROM gov.v_imports_status ORDER BY source"
+        )
+        rows = cur.fetchall()
+
+    table = Table(title="État des imports Nephos")
+    table.add_column("Source", style="cyan", no_wrap=True)
+    table.add_column("Nom")
+    table.add_column("Licence", style="dim")
+    table.add_column("Versions", justify="right")
+    table.add_column("Dernier import", style="dim")
+    table.add_column("Concepts", justify="right")
+    table.add_column("Overrides", justify="right")
+
+    for source, nom, licence, nb_versions, derniere, nb_concepts, nb_overrides in rows:
+        table.add_row(
+            str(source),
+            str(nom or ""),
+            str(licence or ""),
+            str(nb_versions or 0),
+            derniere.strftime("%Y-%m-%d %H:%M") if derniere else "—",
+            str(nb_concepts or 0),
+            str(nb_overrides or 0),
+        )
+    console.print(table)
 
 
 @import_app.command("cf")
