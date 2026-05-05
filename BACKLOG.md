@@ -43,7 +43,7 @@ Décisions structurantes à acter avant d'écrire du code en quantité.
 | E1-05 | ADR 0007 — Outil de curation (Directus / VocBench / app custom React/TS). | P2 | M | E2-* | 📋 |
 | E1-06 | ADR 0008 — Stratégie de conteneurisation et déploiement (Compose dev / Kubernetes prod / autre). | P2 | M | E3-08 | 📋 |
 | E1-07 | Template ADR (MADR 4.0) versionné dans `docs/adr/template.md` pour homogénéiser les futures décisions. | P1 | XS | — | 📋 |
-| E1-08 | `README.md` racine — vision projet, architecture en 1 page, comment démarrer, liens vers ADR et backlog. | P1 | S | — | 📋 |
+| E1-08 | `README.md` racine — vision projet, architecture en 1 page, comment démarrer, liens vers ADR et backlog. | P1 | S | — | ✅ |
 | E1-09 | ADR 0009 — Stratégie d'orchestration ETL (Python pur + GHA en phase 1, Kestra en cible phase 2 sur signal). | P0 | S | — | ✅ |
 
 ---
