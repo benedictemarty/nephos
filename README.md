@@ -151,6 +151,7 @@ Voir l'en-tête commenté de `schema_v4_skos.sql` pour la lecture détaillée.
 | 0007 | Outil de curation (Directus / VocBench / app custom) | À rédiger |
 | 0008 | Conteneurisation et déploiement | À rédiger |
 | [0009](docs/adr/0009-strategie-orchestration-etl.md) | Stratégie d'orchestration ETL (Python + GHA → Kestra sur signal) | Accepté |
+| [0010](docs/adr/0010-nephos-comme-moteur-de-validation.md) | Étendre le périmètre aux outils de validation (GRIB, NetCDF, BUFR…) | Accepté |
 
 ---
 

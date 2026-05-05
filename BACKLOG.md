@@ -161,6 +161,23 @@ Après MVP technique. Concerne l'expérience utilisateur curateur et consommateu
 
 ---
 
+## EPIC 10 — Outils de validation et qualité de données
+
+Acté en [ADR 0010](docs/adr/0010-nephos-comme-moteur-de-validation.md). Outils consommateurs qui exploitent le référentiel pour qualifier des fichiers externes (GRIB, NetCDF, BUFR…) sans rien stocker ni modifier le référentiel automatiquement.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E10-01 | Architecture de la commande `nephos validate <format>` — interface plugin (`extract` / `resolve` / `report`) commune à tous les formats. | P1 | M | E3-03 | 📋 |
+| E10-02 | Validateur GRIB1 / GRIB2 via `eccodes` + `cfgrib`. Résolution `paramId` → concept Nephos via `concept_mapping` (source `ECMWF_PARAMS`), fallback CF Standard Names. | P1 | L | E10-01, E4-06 | 📋 |
+| E10-03 | Rapport de validation au format Rich (interactif terminal), JSON et Markdown. | P1 | M | E10-01 | 📋 |
+| E10-04 | Mode `--suggest` : génère des propositions de mappings manquants en `gov.proposals` lorsqu'un paramètre externe n'est pas résolu. Aucune écriture ailleurs. | P2 | M | E10-02 | 📋 |
+| E10-05 | Validateur NetCDF-CF via `xarray` — vérification des attributs `standard_name`, `units`, `cell_methods` contre le référentiel. | P2 | L | E10-01, E4-02 | 📋 |
+| E10-06 | Validateur BUFR via `pdbufr` ou équivalent — descripteurs WMO ↔ concepts Nephos. | P2 | L | E10-01, E4-05 | 📋 |
+| E10-07 | Action GitHub publiée (`benedictemarty/nephos-validate-action`) pour valider un GRIB en CI sur un dépôt tiers. | P2 | M | E10-02 | 📋 |
+| E10-08 | Documentation utilisateur (`docs/validation.md`) avec exemples de sortie, codes retour et intégration CI. | P2 | S | E10-02, E10-03 | 📋 |
+
+---
+
 ## EPIC 9 — Opération et observabilité
 
 Pré-requis production. Hors MVP.
