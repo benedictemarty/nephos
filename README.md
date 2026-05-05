@@ -10,6 +10,8 @@
 
 **Auteur principal** : Benedicte Marty ([@benedictemarty](https://github.com/benedictemarty)).
 
+> **Politique de contribution** : aucun changement n'arrive sur `main` sans une chaîne de revue à trois niveaux — auteur (humain ou agent IA) → **revue agentique automatisée** → **validation matérielle par un mainteneur senior humain**. La règle s'applique sans exception aux contributions produites par un agent IA en autonomie. Voir [CONTRIBUTING.md § 1](CONTRIBUTING.md#1-chaîne-de-revue-obligatoire-avant-merge).
+
 ---
 
 ## Qu'est-ce que c'est ?
@@ -134,8 +136,9 @@ Voir l'en-tête commenté de `schema_v4_skos.sql` pour la lecture détaillée.
 
 | Document | Rôle |
 |---|---|
-| [BACKLOG.md](BACKLOG.md) | Backlog projet en 9 EPICs, priorités, sprints candidats |
+| [BACKLOG.md](BACKLOG.md) | Backlog projet en 10 EPICs, priorités, sprints candidats |
 | [CHANGELOG.md](CHANGELOG.md) | Journal des modifications (Keep a Changelog 1.1.0) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Workflow de contribution, chaîne de revue agentique + humaine, conventions |
 | [docs/adr/](docs/adr/) | Architecture Decision Records (format MADR) |
 
 ### Décisions d'architecture
@@ -197,4 +200,4 @@ Pour utiliser les données du référentiel, citer Nephos :
 | Dépôt | https://github.com/benedictemarty/nephos |
 | Suivi (issues, propositions) | https://github.com/benedictemarty/nephos/issues |
 
-Les contributions sont les bienvenues — ouverture d'issue ou de pull-request, propositions de mappings, traductions FR. Toute contribution implique acceptation de la double licence du projet (Apache 2.0 sur le code, CC-BY 4.0 sur les données).
+Les contributions sont les bienvenues — ouverture d'issue ou de pull-request, propositions de mappings, traductions FR. **Toute contribution suit la chaîne de revue à trois niveaux** documentée dans [CONTRIBUTING.md](CONTRIBUTING.md) (auteur → revue agentique → validation humaine senior). Toute contribution implique acceptation de la double licence du projet (Apache 2.0 sur le code, CC-BY 4.0 sur les données).

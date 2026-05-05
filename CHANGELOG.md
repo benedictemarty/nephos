@@ -9,6 +9,8 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **`CONTRIBUTING.md`** — politique de contribution et workflow de revue. Acte la **chaîne de revue obligatoire à trois niveaux avant tout merge sur `main`** : auteur (humain ou agent IA) → revue agentique automatisée (rapport structuré déposé en commentaire de PR) → validation matérielle par un mainteneur senior humain. Règle explicitement applicable aux contributions produites par un agent IA en autonomie (aucun droit de merge direct, pas de bypass possible). Documente les conventions (branches, commits, PR), la Definition of Done, l'acceptation des licences (Apache 2.0 + CC-BY 4.0) et les commandes outillage local. Spécifie les **branch protection rules** GitHub à activer (item `E1-11` créé) et l'**agent reviewer GitHub Actions** à configurer (item `E1-12` créé).
+- **Mention politique de revue** ajoutée en tête du `README.md`, sous le bandeau de licences. Section « Auteurs et contact » enrichie avec renvoi à `CONTRIBUTING.md`.
 - **Squelette Alembic** :
   - `alembic.ini` à la racine. URL injectée dynamiquement depuis `nephos.config.Settings` (donc `NEPHOS_DATABASE_URL` ou `.env`). Hook post-write `ruff format` sur les nouveaux scripts. Format de fichier daté + slug + révision.
   - `alembic/env.py` — pas de modèles SQLAlchemy (`target_metadata = None`), Nephos étant en SQL pur. Mode online et offline supportés.

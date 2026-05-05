@@ -40,6 +40,8 @@ Décisions structurantes à acter avant d'écrire du code en quantité.
 | E1-02 | ADR 0004 — Stratégie multilingue. Décision : `prefLabel@fr` ET `prefLabel@en` obligatoires sur les concepts publiés. | P0 | XS | — | ✅ |
 | E1-03 | ADR 0005 — Licences. Décision : Apache 2.0 (code) + CC-BY 4.0 (données originales) + sources amont sous licence d'origine. | P0 | S | — | ✅ |
 | E1-10 | Réservation du préfixe `nephos` sur `perma-id/w3id.org` (PR + `.htaccess` initial pointant sur placeholder). | P1 | S | E1-01 | 📋 |
+| E1-11 | Activer les **branch protection rules** sur `main` côté GitHub : PR obligatoire, ≥1 review humaine approuvée, status checks (`lint`, `type-check`, `security`, `test`, `build`), dismiss stale reviews, linear history, restrict push, no admin bypass. Cf. CONTRIBUTING.md § 1. | **P0** | XS | — | 📋 |
+| E1-12 | Configurer un **agent reviewer GitHub Actions** qui poste un rapport structuré sur chaque PR (cohérence ADR, qualité, sécurité, doc, tests, régression). Cf. CONTRIBUTING.md § 1 niveau 2. | P1 | M | E1-11 | 📋 |
 | E1-04 | ADR 0006 — Choix de la façade API (REST custom FastAPI / GraphQL via Hasura ou pg_graphql / auto-génération PostgREST). Différé en ADR 0002. | P1 | M | E2-01 | 📋 |
 | E1-05 | ADR 0007 — Outil de curation (Directus / VocBench / app custom React/TS). | P2 | M | E2-* | 📋 |
 | E1-06 | ADR 0008 — Stratégie de conteneurisation et déploiement (Compose dev / Kubernetes prod / autre). | P2 | M | E3-08 | 📋 |
