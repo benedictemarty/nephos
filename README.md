@@ -2,6 +2,14 @@
 
 > Référentiel SKOS de métadonnées météorologiques. Vocabulaires alignés sur CF Conventions, WMO Codes Registry et QUDT.
 
+[![Code License: Apache 2.0](https://img.shields.io/badge/code%20license-Apache%202.0-blue.svg)](LICENSE)
+[![Data License: CC BY 4.0](https://img.shields.io/badge/data%20license-CC%20BY%204.0-lightgrey.svg)](DATA_LICENSE)
+[![Status: bootstrap](https://img.shields.io/badge/status-bootstrap-yellow.svg)](#état-actuel)
+
+**Licences** : code et documentation d'ingénierie sous [Apache 2.0](LICENSE) ; données originales (concepts, traductions, mappings éditoriaux) sous [CC-BY 4.0](DATA_LICENSE) ; données importées des sources amont conservent leur licence d'origine. Décision actée en [ADR 0005](docs/adr/0005-licences-apache-2-et-cc-by-4.md).
+
+**Auteur principal** : Benedicte Marty ([@benedictemarty](https://github.com/benedictemarty)).
+
 ---
 
 ## Qu'est-ce que c'est ?
@@ -180,6 +188,12 @@ Pour utiliser les données du référentiel, citer Nephos :
 
 ---
 
-## Contact
+## Auteurs et contact
 
-Repo : https://github.com/benedictemarty/nephos
+| Rôle | Personne |
+|---|---|
+| Auteur principal et mainteneur | **Benedicte Marty** — [@benedictemarty](https://github.com/benedictemarty) |
+| Dépôt | https://github.com/benedictemarty/nephos |
+| Suivi (issues, propositions) | https://github.com/benedictemarty/nephos/issues |
+
+Les contributions sont les bienvenues — ouverture d'issue ou de pull-request, propositions de mappings, traductions FR. Toute contribution implique acceptation de la double licence du projet (Apache 2.0 sur le code, CC-BY 4.0 sur les données).

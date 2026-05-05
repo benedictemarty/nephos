@@ -14,7 +14,10 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Modifié
 
-- **`README.md`** — section démarrage rapide réécrite pour pointer sur `schema_v4_skos.sql`. Tableau d'état actualisé.
+- **`README.md`** :
+  - Section démarrage rapide réécrite pour pointer sur `schema_v4_skos.sql`. Tableau d'état actualisé.
+  - Bandeau de licences (badges Apache 2.0 + CC-BY 4.0) et mention auteur ajoutés en tête, sous le titre.
+  - Section « Contact » remplacée par « Auteurs et contact » avec rôles, lien vers les issues, mention d'acceptation des licences pour les contributions.
 
 ### Retiré
 
