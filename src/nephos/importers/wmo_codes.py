@@ -125,6 +125,7 @@ class WMOCodesImporter(Importer):
 
     @classmethod
     def from_preset(cls, key: str) -> WMOCodesImporter:
+        """Construit un importer à partir d'un preset WMO connu (cf. ``WMO_PRESETS``)."""
         if key not in WMO_PRESETS:
             raise ValueError(f"Preset WMO inconnu : {key!r}. Choix : {sorted(WMO_PRESETS)}")
         preset = WMO_PRESETS[key]
@@ -135,6 +136,7 @@ class WMOCodesImporter(Importer):
         )
 
     def discover_version(self) -> str:
+        """Retourne ``dct:modified`` du register WMO (ou ``"unknown"`` si absent)."""
         graph = self._fetch()
         register = self._find_register(graph)
         modified = graph.value(register, DCT.modified)
@@ -143,11 +145,13 @@ class WMOCodesImporter(Importer):
         return "unknown"
 
     def extract(self) -> object:
+        """Extrait la liste des ``skos:Concept`` membres directs du register."""
         graph = self._fetch()
         register = self._find_register(graph)
         return list(_iter_concepts(graph, register))
 
     def transform(self, raw: object) -> list[dict[str, object]]:
+        """Normalise les entrées WMO en payload prêt pour ``load`` (URI Nephos, label EN)."""
         entries = cast("list[WMOCodeEntry]", raw)
         return [
             {
@@ -165,6 +169,7 @@ class WMOCodesImporter(Importer):
         entries: list[dict[str, object]],
         version: str,
     ) -> ImportResult:
+        """Upsert idempotent des concepts, labels, scheme et `exactMatch` WMO."""
         source_id = _resolve_source_id(conn, self.source_code)
         scheme_id = _ensure_wmo_scheme(
             conn, self._build_scheme_uri(), self._scheme_code, self._scheme_title
@@ -208,6 +213,7 @@ class WMOCodesImporter(Importer):
         )
 
     def _fetch(self) -> rdflib.Graph:
+        """Parse le register Turtle (URL ou fichier) en mémoire (memoïsé)."""
         if self._cached_graph is not None:
             return self._cached_graph
         graph = rdflib.Graph()
@@ -221,6 +227,7 @@ class WMOCodesImporter(Importer):
         return graph
 
     def _find_register(self, graph: rdflib.Graph) -> URIRef:
+        """Localise l'URI du ``reg:Register`` racine dans le graphe."""
         if self._register_uri is not None:
             return self._register_uri
         for subj in graph.subjects(rdflib.RDF.type, REG.Register):
@@ -230,10 +237,12 @@ class WMOCodesImporter(Importer):
         raise ImportSourceError(f"Aucun reg:Register trouvé dans le graphe {self._register_url}.")
 
     def _build_uri(self, notation: str) -> str:
+        """Construit l'URI Nephos d'un concept (cf. ADR 0003)."""
         base = get_settings().uri_base.rstrip("/")
         return f"{base}/{self._scheme_code}/{notation}"
 
     def _build_scheme_uri(self) -> str:
+        """Construit l'URI Nephos du scheme cible."""
         base = get_settings().uri_base.rstrip("/")
         return f"{base}/{self._scheme_code}"
 
@@ -332,6 +341,7 @@ def _upsert_concept(
 def _ensure_wmo_scheme(
     conn: psycopg.Connection, scheme_uri: str, scheme_code: str, scheme_title: str
 ) -> int:
+    """Crée le scheme local s'il n'existe pas, retourne son ``scheme_id``."""
     with conn.cursor() as cur:
         cur.execute("SELECT scheme_id FROM vocab.scheme WHERE uri = %s", (scheme_uri,))
         row = cur.fetchone()
