@@ -63,7 +63,7 @@ Réécriture du `schema_referentiel_v3.sql` en `schema_v4_skos.sql`. Voir ADR 00
 | E2-04 | Trigger d'audit générique étendu à toutes les tables de l'étage SKOS (au-delà des 3 actuels : `scheme`, `concept`, `unite`). | P1 | S | E2-01, E2-03 | 📋 |
 | E2-05 | Vues métier — `v_concepts_actifs`, `v_concepts_mesurables`, `v_proposals_pending`, `v_audit_recent`, `v_imports_status`, `v_concepts_traduction_pending`. | P1 | S | E2-01, E2-03 | ✅ |
 | E2-06 | Vues récursives `v_concept_descendants` / `v_concept_ancestors` (`WITH RECURSIVE`, tolérantes aux cycles). | P1 | S | E2-01 | ✅ |
-| E2-07 | Tests d'intégrité du schéma (insertions valides/invalides, contraintes hiérarchiques, intégrité des mappings). `pytest-postgresql`. | P0 | M | E2-01, E3-04 | 📋 |
+| E2-07 | Tests d'intégrité du schéma : 3 modules (`test_schema_constraints.py` 23 tests, `test_schema_views.py` 8 tests, `test_schema_audit.py` 6 tests) — couvrent contraintes URI/notation/lang/prefLabel, vues métier (incluant la résolution récursive tolérante aux cycles), triggers d'audit (INSERT/UPDATE/STATUS_CHANGE/DELETE). | P0 | M | E2-01, E3-04 | ✅ |
 | E2-08 | Migration alembic initiale capturant le schéma v4 (point de départ versionné). | P1 | S | E2-01, E3-09 | ✅ |
 | E2-09 | Diagramme entité-relation auto-généré (`schemaspy` ou `tbls`) commité dans `docs/schema/`. | P2 | XS | E2-01 | 📋 |
 | E2-10 | Glossaire des entités SKOS (1 page) — pour onboarding non-développeur. | P2 | XS | E2-01 | 📋 |
@@ -87,7 +87,7 @@ Mise en place du squelette technique du backend Python.
 | E3-08 | `Dockerfile` multi-stage (build deps → runtime slim). | P1 | S | E3-01 | 📋 |
 | E3-09 | Squelette Alembic configuré : `alembic.ini`, `alembic/env.py` (URL lue depuis `Settings`, target_metadata=None car pas d'ORM), `script.py.mako`, `alembic/README.md` documentant le workflow. Première migration `0001` qui applique `schema_v4_skos.sql` en bloc (cumule E2-08). | P0 | S | E3-01, E3-04 | ✅ |
 | E3-10 | `docker-compose.yml` dev (Postgres 14 + Nephos CLI). | P1 | S | E3-08 | 📋 |
-| E3-11 | Squelette de tests (`tests/unit`, `tests/integration`) + fixtures Postgres (`pytest-postgresql`). | P0 | S | E3-02 | 📋 |
+| E3-11 | Squelette de tests (`tests/`, `tests/integration/`) + `conftest.py` avec fixtures `db_conn` (recréation du schéma avant chaque test, skip si `NEPHOS_DATABASE_URL` non défini), `admin_user_id`. Tests unitaires CLI (`test_cli.py`) et logging (`test_logging.py`) sans dépendance Postgres. | P0 | S | E3-02 | ✅ |
 
 ---
 
