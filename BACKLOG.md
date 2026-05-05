@@ -120,7 +120,7 @@ Protection contre la dérive du référentiel.
 
 | ID | Titre | P | Taille | Dépend | État |
 |----|-------|---|--------|--------|------|
-| E5-01 | Shapes SHACL de base (SKOS Core) — hiérarchie cohérente, prefLabel unique par langue, mappings dirigés. | P0 | M | E2-01 | 📋 |
+| E5-01 | Shapes SHACL Core (`shapes/nephos_skos_core.ttl`) : URI Nephos (ADR 0003), notation regex (ADR 0003), prefLabel ≥1 + uniqueLang, **PublishedConcept** virtuel imposant FR+EN (ADR 0004), pas de self-broader (SKOS S27). Module `nephos.validators.shacl_runner` construit le graphe RDF depuis Postgres et exécute pyshacl. CLI `nephos validate shacl [--scheme CODE] [--strict] [--report]`. **Validation live : 5023 concepts CF conformes en mode normal ; 5023 violations en mode --strict** (file de traduction FR identifiée). 5 tests d'intégration. | P0 | M | E2-01 | ✅ |
 | E5-02 | Shapes SHACL spécifiques Nephos — règles métier (un concept mesurable doit avoir une unité canonique, etc.). | P1 | M | E5-01, E2-02 | 📋 |
 | E5-03 | Validation systématique post-import via `pyshacl`, échec bloquant si violations majeures. | P0 | S | E5-01, E4-01 | 📋 |
 | E5-04 | Rapport de qualité automatisé (concepts orphelins, hiérarchies incohérentes, mappings doublons, labels manquants). | P1 | M | E5-01 | 📋 |

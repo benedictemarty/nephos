@@ -179,9 +179,47 @@ def export_turtle(
 
 
 @validate_app.command("shacl")
-def validate_shacl() -> None:
-    """Valide les concepts contre les shapes SHACL Nephos."""
-    console.print("[yellow]Pas encore implémenté.[/yellow] Voir items E5-01..03 du backlog.")
+def validate_shacl(
+    scheme: Annotated[
+        str | None,
+        typer.Option("--scheme", help="Limite la validation à un scheme (code)."),
+    ] = None,
+    treat_as_published: Annotated[
+        bool,
+        typer.Option(
+            "--strict",
+            help=(
+                "Force la validation comme si tous les concepts étaient publiés "
+                "(impose prefLabel@fr ET @en, ADR 0004)."
+            ),
+        ),
+    ] = False,
+    show_report: Annotated[
+        bool,
+        typer.Option("--report", help="Affiche le rapport SHACL complet (texte)."),
+    ] = False,
+) -> None:
+    """Valide les concepts du référentiel contre les shapes SHACL Nephos Core."""
+    from nephos.db import connect
+    from nephos.validators import SHACLValidator
+
+    validator = SHACLValidator(treat_as_published=treat_as_published)
+    with connect() as conn:
+        result = validator.validate(conn, scheme_code=scheme)
+
+    table = Table(title="Validation SHACL — Nephos Core")
+    table.add_column("Métrique", style="cyan")
+    table.add_column("Valeur", justify="right")
+    table.add_row("Conforme", "✅" if result.conforms else "❌")
+    table.add_row("Concepts validés", str(result.concepts_validated))
+    table.add_row("Violations", str(result.violations))
+    table.add_row("Warnings", str(result.warnings))
+    table.add_row("Infos", str(result.infos))
+    console.print(table)
+
+    if show_report and not result.conforms:
+        console.print("\n[bold]Rapport détaillé :[/bold]")
+        console.print(result.raw_report)
 
 
 if __name__ == "__main__":  # pragma: no cover
