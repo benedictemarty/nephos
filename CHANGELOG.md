@@ -9,6 +9,11 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Commande `nephos validate all`** (E5-05) — point d'entrée unique combinant SHACL Core (E5-01) et rapport qualité (E5-04) sur un sous-ensemble du référentiel.
+  - Filtre commun `--scheme CODE` propagé aux deux validateurs. Option `--strict` héritée du SHACL pour imposer FR+EN sur les concepts validés (ADR 0004).
+  - `--fail-on-error` retourne exit 2 si SHACL non conforme OU si la qualité signale au moins une anomalie de sévérité `error` — exploitable directement en pipeline CI / post-import.
+  - Sortie Rich unifiée : table à deux phases (SHACL + Qualité) avec compteurs ; les commandes `validate shacl` et `validate quality` restent disponibles pour les rapports détaillés.
+  - 3 tests d'intégration via `typer.testing.CliRunner` : base saine → exit 0, concept orphelin + `--fail-on-error` → exit 2, concept orphelin sans flag → exit 0.
 - **Rapport qualité automatisé** (E5-04) — `nephos.validators.quality_report.QualityReporter` scanne la base à la recherche d'anomalies structurelles complémentaires au validateur SHACL Core.
   - 8 détecteurs : `concepts_without_pref_label` (error), `concepts_without_scheme` (warning), `concepts_self_broader` (error), `duplicate_pref_label_lang` (error), `duplicate_notation_in_scheme` (error), `duplicate_mappings` (error, mêmes `(concept, target_uri)` avec relations divergentes), `missing_pref_label_fr` et `missing_pref_label_en` (warning sur concepts publiés, ADR 0004).
   - Sortie structurée : `QualityReport` agrège une liste de `QualityFinding` (code stable, label humain, severity ∈ error/warning/info, count, samples ≤ 5 URIs). Propriétés `has_errors` et `total_anomalies`.
