@@ -9,6 +9,16 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **`CFStandardNamesImporter`** (E4-02) — premier import concret consommant le framework E4-01.
+  - Parse l'XML CF Standard Names (URL officielle par défaut, fichier local en fallback pour tests/dev).
+  - Normalise les notations CF en minuscules pour respecter ADR 0003 (URI Nephos `^[a-z0-9][a-z0-9_-]*$`). L'identifiant CF original (qui peut contenir des majuscules pour les isotopes : `13C`, `18O`) est conservé dans `concept_physical.cf_standard_name`. Les `prefLabel@en` humanisés (underscores → espaces) gardent la casse originale pour préserver la sémantique scientifique.
+  - Crée le scheme `grandeurs-cf` à la première importation.
+  - Pour chaque entrée : `vocab.concept` (status `approved` — ADR 0004 : `published` requiert FR), `concept_label@en` (pref), `concept_note@en` (definition depuis `<description>`), `concept_in_scheme`, `concept_mapping` (`exactMatch` vers la fiche CF officielle), `concept_physical` (`value_type='scalar'`, `cf_standard_name`, `unit_canonical_id` résolu best-effort via `vocab.unite.symbole`).
+  - Idempotent par URI : re-run même version → 0 création / N skipped. Re-run nouvelle version → mise à jour de `import_version` et `last_synced_at`. `has_local_override = TRUE` est respecté (override préservé, comptabilisé en `nb_overrides_protected`).
+  - **Validation live** : import du fichier officiel CF v93 (~5023 concepts) en **16 secondes** end-to-end. Le critère ADR 0001 (≥ 5000 concepts en < 5 minutes) est largement atteint.
+  - 8 tests d'intégration sur fixture XML mini (4 entrées) : création complète, idempotence, dry-run, résolution d'unité, override local protégé, note de warning sur unités non résolues, parsing transform pur.
+  - CLI : `nephos import cf [--dry-run] [--source PATH_OR_URL]` invoque le pipeline complet et affiche le rapport en table Rich.
+
 - **ADR 0013 — Adopter Claude Code GitHub Action comme agent reviewer** (`docs/adr/0013-agent-reviewer-claude-code-action.md`). Acte le choix de `anthropics/claude-code-action@v1` authentifié via OAuth Max (sans coût marginal au token), pour produire à chaque ouverture/synchronisation de PR un rapport structuré en 6 sections + verdict explicite. Le rapport est un **éclairage** pour le reviewer humain — pas un statut bloquant ni un droit de merge. Hors-périmètre : auto-approval, persistance des rapports, PRs depuis forks externes (à traiter ultérieurement avec un workflow `pull_request_target` sécurisé séparé).
 - **`.github/workflows/agent-review.yml`** — workflow d'exécution de l'agent reviewer. Triggers : `pull_request: [opened, synchronize, reopened]` (volontairement pas `pull_request_target` pour ne pas exposer le secret OAuth aux PR depuis forks) + `workflow_dispatch` pour relance manuelle. Concurrence par branche avec `cancel-in-progress`. Permissions minimales : `contents: read`, `pull-requests: write`, `issues: write`. Pas de droit de merge ni d'écriture sur le code. Skip des PRs en draft pour économiser le quota Max. Prompt versionné qui charge le contexte ADR pertinent et impose le format de rapport (6 sections + verdict).
 - Item `E1-12` du backlog marqué ✅ (l'activation effective dépend de l'ajout du secret `CLAUDE_CODE_OAUTH_TOKEN` côté GitHub par le mainteneur — étape manuelle, validée dans la procédure de l'ADR 0013).

@@ -24,6 +24,7 @@ dependencies = [
     "rdflib>=7.0",
     "pyshacl>=0.26",
     "lxml>=5.0",
+    "defusedxml>=0.7",
     "requests>=2.32",
     "sparqlwrapper>=2.0",
     "pydantic>=2.7",
@@ -91,6 +92,7 @@ dev = [
     "vulture>=2.13",
     "validate-pyproject[all]>=0.23",
     "pre-commit>=3.7",
+    "types-defusedxml>=0.7.0.20260504",
 ]
 
 # ----- Ruff (lint + format) -----
