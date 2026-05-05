@@ -1,0 +1,83 @@
+# Shapes SHACL Nephos — niveau métier (E5-02).
+#
+# Règles spécifiques au modèle Nephos qui vont au-delà du SKOS Core :
+# elles encodent les invariants découlant des ADR projet et des choix de
+# domaine (météo).
+#
+# À utiliser en complément de `nephos_skos_core.ttl`. Sévérité par défaut :
+# sh:Warning (informatif), sauf indication contraire — le reviewer humain
+# tranche lors de la publication.
+
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix nephos: <https://w3id.org/nephos/shapes/> .
+
+# ----------------------------------------------------------------------
+# 1. Concept mesurable doit être typé physique avec value_type connu.
+#    Cette shape ne peut s'évaluer qu'avec le marqueur virtuel
+#    `nephos:MeasurableConcept` posé par le constructeur de graphe quand
+#    une ligne `concept_physical` existe pour le concept (déduit en SQL,
+#    pas en SHACL — voir `nephos.validators.shacl_runner`).
+# ----------------------------------------------------------------------
+
+nephos:MeasurableConceptShape
+    a sh:NodeShape ;
+    sh:targetClass nephos:MeasurableConcept ;
+    sh:property [
+        sh:path nephos:valueType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ( "scalar" "vector" "tensor" "code" "boolean" "string" "datetime" ) ;
+        sh:message "Un concept mesurable doit avoir un value_type parmi {scalar, vector, tensor, code, boolean, string, datetime}." ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ----------------------------------------------------------------------
+# 2. Concept scalaire / vectoriel / tensoriel doit avoir une unité
+#    canonique. Les types `code`, `boolean`, `string`, `datetime` n'en
+#    requièrent pas.
+# ----------------------------------------------------------------------
+
+nephos:NumericMeasurableShape
+    a sh:NodeShape ;
+    sh:targetClass nephos:NumericMeasurableConcept ;
+    sh:property [
+        sh:path nephos:hasUnit ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "Un concept mesurable scalaire/vectoriel/tensoriel doit avoir une unité canonique (`vocab.unite`)." ;
+        sh:severity sh:Warning ;
+    ] .
+
+# ----------------------------------------------------------------------
+# 3. Tout concept publié doit avoir au moins une attribution amont
+#    (dcterms:source) ou une définition locale (skos:definition).
+# ----------------------------------------------------------------------
+
+nephos:AttributionShape
+    a sh:NodeShape ;
+    sh:targetClass nephos:PublishedConcept ;
+    sh:or (
+        [ sh:property [ sh:path dcterms:source ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path skos:definition ; sh:minCount 1 ] ]
+    ) ;
+    sh:message "Un concept publié doit porter une attribution (dcterms:source) ou au moins une définition locale (skos:definition)." ;
+    sh:severity sh:Warning .
+
+# ----------------------------------------------------------------------
+# 4. Tout concept doit appartenir à au moins un scheme (`skos:inScheme`).
+#    Empêche les concepts orphelins isolés du référentiel.
+# ----------------------------------------------------------------------
+
+nephos:InSchemeShape
+    a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    sh:property [
+        sh:path skos:inScheme ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "Tout concept devrait appartenir à au moins un skos:ConceptScheme. À durcir en Violation lors d'un sprint qualité (concepts orphelins à corriger d'abord)." ;
+        sh:severity sh:Warning ;
+    ] .
