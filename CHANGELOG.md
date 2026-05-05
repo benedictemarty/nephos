@@ -9,6 +9,13 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Validation des exports par un outil tiers** (E6-03) — `nephos.validators.skos_external.SkosExternalValidator` réutilise `SKOSExporter` (E6-01) pour produire le graphe Turtle exact qui serait publié, puis exécute les checks SKOS standards via la bibliothèque **`skosify`** (NatLibFi, MIT).
+  - Checks : `hierarchy_cycles` (cycles broader, SKOS S22/S27), `disjoint_relations` (broader/related disjoints, S27), `preflabel_uniqueness` (un prefLabel par lang, S14), `hierarchical_redundancy` (broader transitivement redondant), `label_overlap` (libellé partagé entre concepts distincts).
+  - Capture programmatique des warnings skosify via un handler logging dédié (skosify logue sur le root logger). Classification par regex sur le message vers un code stable.
+  - Sortie structurée : `SkosExternalReport` (`nb_concepts`, `issues`, propriété `conforms`, méthode `by_check()`) et `SkosExternalIssue` (`check`, `severity`, `message`).
+  - CLI : `nephos validate skos-external [--scheme CODE] [--issues/--no-issues] [--fail-on-issue]`. Le mode `--fail-on-issue` retourne exit 2 si au moins une anomalie est détectée — exploitable en pipeline CI.
+  - 6 tests d'intégration : graphe propre conforme, cycle broader détecté, disjonction broader/related détectée, classification de messages connus + fallback `unknown`, agrégation `by_check()`.
+  - Choix `skosify` plutôt que Skosmos (JVM lourd, déploiement séparé) ou SKOS-Play (validateur en ligne hors CI) : pure Python, exécutable dans le même process, validation SKOS conforme à l'esprit de l'ADR 0001 (export validé par outil tiers).
 - **Commande `nephos validate all`** (E5-05) — point d'entrée unique combinant SHACL Core (E5-01) et rapport qualité (E5-04) sur un sous-ensemble du référentiel.
   - Filtre commun `--scheme CODE` propagé aux deux validateurs. Option `--strict` héritée du SHACL pour imposer FR+EN sur les concepts validés (ADR 0004).
   - `--fail-on-error` retourne exit 2 si SHACL non conforme OU si la qualité signale au moins une anomalie de sévérité `error` — exploitable directement en pipeline CI / post-import.

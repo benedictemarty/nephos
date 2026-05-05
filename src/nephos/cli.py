@@ -463,6 +463,56 @@ def validate_quality(
         raise typer.Exit(code=2)
 
 
+@validate_app.command("skos-external")
+def validate_skos_external(
+    scheme: Annotated[
+        str | None,
+        typer.Option("--scheme", help="Scheme à valider (par défaut : tout l'export)."),
+    ] = None,
+    show_issues: Annotated[
+        bool,
+        typer.Option("--issues/--no-issues", help="Affiche le détail de chaque anomalie."),
+    ] = True,
+    fail_on_issue: Annotated[
+        bool,
+        typer.Option("--fail-on-issue", help="Exit 2 si ≥ 1 anomalie détectée."),
+    ] = False,
+) -> None:
+    """Validation de l'export SKOS par l'outil tiers `skosify` (E6-03).
+
+    Réutilise `SKOSExporter` pour produire le graphe RDF Turtle qui
+    serait publié, puis exécute les checks SKOS standards : cycles
+    hiérarchiques, disjonction broader/related, unicité prefLabel
+    par langue, redondance hiérarchique, chevauchement de libellés.
+    """
+    from nephos.db import connect
+    from nephos.validators import SkosExternalValidator
+
+    validator = SkosExternalValidator(scheme_code=scheme)
+    with connect() as conn:
+        report = validator.validate(conn)
+
+    table = Table(title=f"Validation SKOS externe (skosify) — {scheme or 'tout'}")
+    table.add_column("Indicateur", style="cyan")
+    table.add_column("Valeur", justify="right")
+    table.add_row("Concepts exportés", str(report.nb_concepts))
+    table.add_row("Conforme", "[green]oui[/green]" if report.conforms else "[red]non[/red]")
+    table.add_row("Total anomalies", str(len(report.issues)))
+    for check, count in sorted(report.by_check().items()):
+        table.add_row(f"  └─ {check}", str(count))
+    console.print(table)
+
+    if show_issues and report.issues:
+        console.print("\n[bold]Détail des anomalies :[/bold]")
+        for issue in report.issues[:50]:
+            console.print(f"  [{issue.severity}] [{issue.check}] {issue.message}")
+        if len(report.issues) > 50:
+            console.print(f"  … et {len(report.issues) - 50} autre(s).")
+
+    if fail_on_issue and report.issues:
+        raise typer.Exit(code=2)
+
+
 @validate_app.command("all")
 def validate_all(
     scheme: Annotated[

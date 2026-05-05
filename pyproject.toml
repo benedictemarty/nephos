@@ -33,6 +33,7 @@ dependencies = [
     "typer>=0.12",
     "rich>=13.7",
     "alembic>=1.13",
+    "skosify>=2.3.0",
 ]
 
 [project.optional-dependencies]
@@ -148,6 +149,7 @@ module = [
     "pyshacl.*",
     "SPARQLWrapper.*",
     "lxml.*",
+    "skosify.*",
 ]
 ignore_missing_imports = true
 

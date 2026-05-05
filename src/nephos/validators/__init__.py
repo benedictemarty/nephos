@@ -17,6 +17,11 @@ from nephos.validators.shacl_runner import (
     SHACLValidator,
     ValidationOutcome,
 )
+from nephos.validators.skos_external import (
+    SkosExternalIssue,
+    SkosExternalReport,
+    SkosExternalValidator,
+)
 
 __all__ = [
     "QualityFinding",
@@ -24,5 +29,8 @@ __all__ = [
     "QualityReporter",
     "SHACLValidationReport",
     "SHACLValidator",
+    "SkosExternalIssue",
+    "SkosExternalReport",
+    "SkosExternalValidator",
     "ValidationOutcome",
 ]
