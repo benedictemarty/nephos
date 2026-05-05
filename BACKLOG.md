@@ -99,7 +99,7 @@ Implémentation des imports — partie qui livre la valeur fonctionnelle visible
 
 | ID | Titre | P | Taille | Dépend | État |
 |----|-------|---|--------|--------|------|
-| E4-01 | Framework ETL générique : interface `Importer`, journal de run dans `gov.imports`, gestion des trois cas de re-sync (inchangé / mis à jour / override local). | **P0** | M | E2-01, E3-03 | 📋 |
+| E4-01 | Framework ETL générique : interface `Importer` (ABC : `discover_version`, `extract`, `transform`, `load`), `ImportRunner` orchestrateur (cycle `discover → open journal → extract → transform → load → close` ou `failed`), `RunOptions` (force, user_id, dry_run), journal `gov.imports` (open/close/failure récupérée hors-transaction), exceptions typées, helpers `nephos.db.connect()`. 5 tests d'intégration valident création/idempotence/échec rollback/dry-run/source inconnue. | **P0** | M | E2-01, E3-03 | ✅ |
 | E4-02 | Import **CF Standard Names** (~5500 concepts) depuis l'XML officiel. Critère : `< 5 min` end-to-end. | **P0** | M | E4-01 | 📋 |
 | E4-03 | Import **CF Cell Methods** + **CF Areas** + **CF Regions** (~600 concepts cumulés). | P0 | S | E4-02 | 📋 |
 | E4-04 | Import **QUDT Units** + **QuantityKinds** (~2000 unités) en RDF/OWL, avec alignement `unite` ↔ QUDT. | P0 | M | E4-01, E2-02 | 📋 |

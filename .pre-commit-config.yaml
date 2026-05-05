@@ -59,6 +59,8 @@ repos:
           - pydantic-settings>=2.4
           - typer>=0.12
           - types-requests
+          - psycopg[binary]>=3.2
+          - rich>=13.7
 
   # ----- Python : Bandit (analyse sécurité statique) -----
   - repo: https://github.com/PyCQA/bandit

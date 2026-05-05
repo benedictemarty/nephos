@@ -65,19 +65,36 @@ def info() -> None:
     console.print(table)
 
 
-# ----- import (squelette) -----
+# ----- import -----
 
 
 @import_app.command("status")
 def import_status() -> None:
-    """Affiche l'état de synchronisation de chaque source standard."""
+    """Affiche l'état de synchronisation de chaque source standard.
+
+    Implémentation complète : item E4-09 du backlog.
+    Pour l'instant, un SELECT sur la vue `gov.v_imports_status`
+    suffira (à ajouter quand E4-09 sera traité).
+    """
     console.print("[yellow]Pas encore implémenté.[/yellow] Voir item E4-09 du backlog.")
 
 
 @import_app.command("cf")
-def import_cf() -> None:
-    """Importe les CF Standard Names depuis cfconventions.org."""
-    console.print("[yellow]Pas encore implémenté.[/yellow] Voir item E4-02 du backlog.")
+def import_cf(
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="N'écrit rien en base.")] = False,
+) -> None:
+    """Importe les CF Standard Names depuis cfconventions.org.
+
+    Implémentation complète : item E4-02 du backlog. Le framework ETL
+    (`nephos.etl`, item E4-01) est en place — il manque l'`Importer`
+    concret CF.
+    """
+    _ = dry_run
+    console.print(
+        "[yellow]Pas encore implémenté.[/yellow] "
+        "Le framework ETL est livré (E4-01 ✅). L'Importer CF concret "
+        "viendra avec l'item E4-02."
+    )
 
 
 # ----- db (squelette) -----
