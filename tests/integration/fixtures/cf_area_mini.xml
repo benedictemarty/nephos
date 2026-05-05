@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<area_type_table>
+    <title>Area Type Table (mini fixture)</title>
+    <version_number>13</version_number>
+    <date>2026-05-05</date>
+    <institution>Centre for Environmental Data Analysis</institution>
+    <contact>support@ceda.ac.uk</contact>
+
+    <entry id="air">
+        <description>The area type "air" distinguishes the atmospheric portion of a domain.</description>
+    </entry>
+
+    <entry id="land">
+        <description>The land area as opposed to sea or sea_ice.</description>
+    </entry>
+
+    <entry id="sea_ice">
+        <description>Sea ice covering the ocean surface.</description>
+    </entry>
+
+    <entry id="bare_ground">
+        <description></description>
+    </entry>
+</area_type_table>
