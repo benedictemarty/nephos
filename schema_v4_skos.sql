@@ -277,9 +277,13 @@ CREATE TABLE vocab.concept_semantic_relation (
                             'exactMatch','closeMatch','broadMatch','narrowMatch','relatedMatch'
                           )),
   scheme_id              BIGINT REFERENCES vocab.scheme(scheme_id) ON DELETE CASCADE,
-  CHECK (source_concept_id <> target_concept_id),
-  UNIQUE (source_concept_id, target_concept_id, relation, COALESCE(scheme_id, 0))
+  CHECK (source_concept_id <> target_concept_id)
 );
+-- Unicité (source, target, relation, scheme) avec NULL traité comme valeur scalaire :
+-- PostgreSQL interdit COALESCE dans une contrainte UNIQUE inline, on utilise un index.
+CREATE UNIQUE INDEX uq_csr_relation_scope
+  ON vocab.concept_semantic_relation
+  (source_concept_id, target_concept_id, relation, COALESCE(scheme_id, 0));
 CREATE INDEX ix_csr_source   ON vocab.concept_semantic_relation(source_concept_id, relation);
 CREATE INDEX ix_csr_target   ON vocab.concept_semantic_relation(target_concept_id, relation);
 CREATE INDEX ix_csr_relation ON vocab.concept_semantic_relation(relation);

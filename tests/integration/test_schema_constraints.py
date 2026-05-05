@@ -55,6 +55,7 @@ def _insert_concept(conn: Connection, uri: str, notation: str) -> int:
 # Scheme : URI ^https?://
 # ----------------------------------------------------------------------
 
+
 class TestSchemeConstraints:
     def test_scheme_accepts_https_uri(self, db_conn: Connection) -> None:
         sid = _insert_scheme(db_conn, "test", "https://w3id.org/nephos/vocab/test")
@@ -77,6 +78,7 @@ class TestSchemeConstraints:
 # ----------------------------------------------------------------------
 # Concept : notation pattern, URI, valid_from < valid_to
 # ----------------------------------------------------------------------
+
 
 class TestConceptConstraints:
     def test_concept_accepts_snake_case_notation(self, db_conn: Connection) -> None:
@@ -117,25 +119,23 @@ class TestConceptConstraints:
         with pytest.raises(UniqueViolation):
             _insert_concept(db_conn, uri, "temperature_air_v2")
 
-    def test_concept_valid_to_must_be_after_valid_from(
-        self, db_conn: Connection
-    ) -> None:
-        with db_conn.cursor() as cur:
-            with pytest.raises(CheckViolation):
-                cur.execute(
-                    """
+    def test_concept_valid_to_must_be_after_valid_from(self, db_conn: Connection) -> None:
+        with db_conn.cursor() as cur, pytest.raises(CheckViolation):
+            cur.execute(
+                """
                     INSERT INTO vocab.concept
                       (uri, notation, status, valid_from, valid_to)
                     VALUES
                       (%s, %s, 'draft', '2025-01-01', '2024-01-01')
                     """,
-                    ("https://w3id.org/nephos/vocab/test/x", "x"),
-                )
+                ("https://w3id.org/nephos/vocab/test/x", "x"),
+            )
 
 
 # ----------------------------------------------------------------------
 # Labels : prefLabel unique par (concept, lang), BCP 47
 # ----------------------------------------------------------------------
+
 
 class TestLabelConstraints:
     @pytest.fixture
@@ -146,9 +146,7 @@ class TestLabelConstraints:
             "temperature_air",
         )
 
-    def test_pref_label_unique_per_lang(
-        self, db_conn: Connection, concept_id: int
-    ) -> None:
+    def test_pref_label_unique_per_lang(self, db_conn: Connection, concept_id: int) -> None:
         with db_conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO vocab.concept_label (concept_id, lang, kind, value) "
@@ -183,9 +181,7 @@ class TestLabelConstraints:
             row = cur.fetchone()
             assert row is not None and row[0] == 2
 
-    def test_alt_labels_can_be_multiple(
-        self, db_conn: Connection, concept_id: int
-    ) -> None:
+    def test_alt_labels_can_be_multiple(self, db_conn: Connection, concept_id: int) -> None:
         with db_conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO vocab.concept_label (concept_id, lang, kind, value) "
@@ -198,32 +194,27 @@ class TestLabelConstraints:
                 (concept_id,),
             )
 
-    def test_lang_must_be_bcp47(
-        self, db_conn: Connection, concept_id: int
-    ) -> None:
-        with db_conn.cursor() as cur:
-            with pytest.raises(CheckViolation):
-                cur.execute(
-                    "INSERT INTO vocab.concept_label (concept_id, lang, kind, value) "
-                    "VALUES (%s, 'FRENCH', 'pref', 'Température')",
-                    (concept_id,),
-                )
+    def test_lang_must_be_bcp47(self, db_conn: Connection, concept_id: int) -> None:
+        with db_conn.cursor() as cur, pytest.raises(CheckViolation):
+            cur.execute(
+                "INSERT INTO vocab.concept_label (concept_id, lang, kind, value) "
+                "VALUES (%s, 'FRENCH', 'pref', 'Température')",
+                (concept_id,),
+            )
 
-    def test_label_value_cannot_be_empty(
-        self, db_conn: Connection, concept_id: int
-    ) -> None:
-        with db_conn.cursor() as cur:
-            with pytest.raises(CheckViolation):
-                cur.execute(
-                    "INSERT INTO vocab.concept_label (concept_id, lang, kind, value) "
-                    "VALUES (%s, 'fr', 'pref', '')",
-                    (concept_id,),
-                )
+    def test_label_value_cannot_be_empty(self, db_conn: Connection, concept_id: int) -> None:
+        with db_conn.cursor() as cur, pytest.raises(CheckViolation):
+            cur.execute(
+                "INSERT INTO vocab.concept_label (concept_id, lang, kind, value) "
+                "VALUES (%s, 'fr', 'pref', '')",
+                (concept_id,),
+            )
 
 
 # ----------------------------------------------------------------------
 # Relations sémantiques
 # ----------------------------------------------------------------------
+
 
 class TestRelationConstraints:
     def test_relation_source_cannot_equal_target(self, db_conn: Connection) -> None:
@@ -232,14 +223,13 @@ class TestRelationConstraints:
             "https://w3id.org/nephos/vocab/test/x",
             "x",
         )
-        with db_conn.cursor() as cur:
-            with pytest.raises(CheckViolation):
-                cur.execute(
-                    "INSERT INTO vocab.concept_semantic_relation "
-                    "(source_concept_id, target_concept_id, relation) "
-                    "VALUES (%s, %s, 'broader')",
-                    (cid, cid),
-                )
+        with db_conn.cursor() as cur, pytest.raises(CheckViolation):
+            cur.execute(
+                "INSERT INTO vocab.concept_semantic_relation "
+                "(source_concept_id, target_concept_id, relation) "
+                "VALUES (%s, %s, 'broader')",
+                (cid, cid),
+            )
 
     def test_multi_broader_supported(self, db_conn: Connection) -> None:
         c_temp = _insert_concept(
@@ -277,6 +267,7 @@ class TestRelationConstraints:
 # Mapping vers source externe
 # ----------------------------------------------------------------------
 
+
 class TestMappingConstraints:
     def test_mapping_requires_known_source(self, db_conn: Connection) -> None:
         cid = _insert_concept(
@@ -284,14 +275,13 @@ class TestMappingConstraints:
             "https://w3id.org/nephos/vocab/test/x",
             "x",
         )
-        with db_conn.cursor() as cur:
-            with pytest.raises(ForeignKeyViolation):
-                cur.execute(
-                    "INSERT INTO vocab.concept_mapping "
-                    "(concept_id, target_source_id, target_uri, mapping_relation) "
-                    "VALUES (%s, 99999, 'https://example.org/x', 'exactMatch')",
-                    (cid,),
-                )
+        with db_conn.cursor() as cur, pytest.raises(ForeignKeyViolation):
+            cur.execute(
+                "INSERT INTO vocab.concept_mapping "
+                "(concept_id, target_source_id, target_uri, mapping_relation) "
+                "VALUES (%s, 99999, 'https://example.org/x', 'exactMatch')",
+                (cid,),
+            )
 
     def test_mapping_to_known_source_succeeds(self, db_conn: Connection) -> None:
         cid = _insert_concept(
@@ -308,13 +298,18 @@ class TestMappingConstraints:
                 "INSERT INTO vocab.concept_mapping "
                 "(concept_id, target_source_id, target_uri, mapping_relation) "
                 "VALUES (%s, %s, %s, 'exactMatch')",
-                (cid, cf_id, "https://cfconventions.org/Data/cf-standard-names/77/build/cf-standard-name-table.html#air_temperature"),
+                (
+                    cid,
+                    cf_id,
+                    "https://cfconventions.org/Data/cf-standard-names/77/build/cf-standard-name-table.html#air_temperature",
+                ),
             )
 
 
 # ----------------------------------------------------------------------
 # Concept physical : value_type valide, range cohérent
 # ----------------------------------------------------------------------
+
 
 class TestConceptPhysicalConstraints:
     def test_range_min_must_not_exceed_range_max(self, db_conn: Connection) -> None:
@@ -323,14 +318,13 @@ class TestConceptPhysicalConstraints:
             "https://w3id.org/nephos/vocab/test/x",
             "x",
         )
-        with db_conn.cursor() as cur:
-            with pytest.raises(CheckViolation):
-                cur.execute(
-                    "INSERT INTO vocab.concept_physical "
-                    "(concept_id, value_type, range_min, range_max) "
-                    "VALUES (%s, 'scalar', 100, 50)",
-                    (cid,),
-                )
+        with db_conn.cursor() as cur, pytest.raises(CheckViolation):
+            cur.execute(
+                "INSERT INTO vocab.concept_physical "
+                "(concept_id, value_type, range_min, range_max) "
+                "VALUES (%s, 'scalar', 100, 50)",
+                (cid,),
+            )
 
     def test_value_type_must_be_in_enum(self, db_conn: Connection) -> None:
         cid = _insert_concept(
@@ -338,10 +332,8 @@ class TestConceptPhysicalConstraints:
             "https://w3id.org/nephos/vocab/test/x",
             "x",
         )
-        with db_conn.cursor() as cur:
-            with pytest.raises(CheckViolation):
-                cur.execute(
-                    "INSERT INTO vocab.concept_physical "
-                    "(concept_id, value_type) VALUES (%s, 'matrix')",
-                    (cid,),
-                )
+        with db_conn.cursor() as cur, pytest.raises(CheckViolation):
+            cur.execute(
+                "INSERT INTO vocab.concept_physical (concept_id, value_type) VALUES (%s, 'matrix')",
+                (cid,),
+            )

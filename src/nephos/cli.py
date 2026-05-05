@@ -17,6 +17,7 @@ app: typer.Typer = typer.Typer(
     help="Référentiel SKOS de métadonnées météorologiques.",
     no_args_is_help=True,
     add_completion=False,
+    invoke_without_command=True,
 )
 
 import_app: typer.Typer = typer.Typer(

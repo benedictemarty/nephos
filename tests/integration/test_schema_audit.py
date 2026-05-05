@@ -13,9 +13,7 @@ from psycopg import Connection
 pytestmark = pytest.mark.integration
 
 
-def _audit_rows(
-    conn: Connection, table: str, entity_id: int
-) -> list[tuple[str, list[str] | None]]:
+def _audit_rows(conn: Connection, table: str, entity_id: int) -> list[tuple[str, list[str] | None]]:
     """Retourne (action, changed_columns) pour les entrées d'audit d'un objet."""
     with conn.cursor() as cur:
         cur.execute(
@@ -43,9 +41,7 @@ class TestAuditTrigger:
         assert len(rows) == 1
         assert rows[0][0] == "INSERT"
 
-    def test_update_logs_update_with_changed_columns(
-        self, db_conn: Connection
-    ) -> None:
+    def test_update_logs_update_with_changed_columns(self, db_conn: Connection) -> None:
         with db_conn.cursor() as cur:
             cur.execute(
                 "INSERT INTO vocab.concept (uri, notation, status) "

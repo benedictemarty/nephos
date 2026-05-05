@@ -8,6 +8,10 @@ MD013: false
 # Plusieurs H1 dans le même fichier : on accepte (CHANGELOG, BACKLOG).
 MD025: false
 
+# Titres dupliqués : indispensable pour Keep a Changelog
+# (### Ajouté / Modifié / Retiré se répètent à chaque release).
+MD024: false
+
 # Code blocks sans langue spécifiée : toléré pour les blocs ASCII art.
 MD040: false
 

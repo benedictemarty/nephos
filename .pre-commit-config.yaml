@@ -70,10 +70,17 @@ repos:
         files: ^src/nephos/
 
   # ----- Python : Deptry (dépendances inutilisées ou manquantes) -----
-  - repo: https://github.com/fpgmaas/deptry
-    rev: 0.21.1
+  # Hook local : on appelle deptry via uv run pour éviter les écueils
+  # d'environnement isolé (le hook officiel n'expose pas correctement
+  # l'exécutable dans certaines installs).
+  - repo: local
     hooks:
       - id: deptry
+        name: deptry
+        entry: uv run deptry .
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|src/)
 
   # ----- Python : validation du pyproject.toml -----
   - repo: https://github.com/abravalheri/validate-pyproject

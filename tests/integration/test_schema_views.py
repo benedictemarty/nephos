@@ -13,9 +13,7 @@ from psycopg import Connection
 pytestmark = pytest.mark.integration
 
 
-def _create_concept(
-    conn: Connection, uri: str, notation: str, status: str = "draft"
-) -> int:
+def _create_concept(conn: Connection, uri: str, notation: str, status: str = "draft") -> int:
     with conn.cursor() as cur:
         cur.execute(
             "INSERT INTO vocab.concept (uri, notation, status) "
@@ -49,6 +47,7 @@ def _add_broader(conn: Connection, child: int, parent: int) -> None:
 # ----------------------------------------------------------------------
 # v_concepts_actifs
 # ----------------------------------------------------------------------
+
 
 class TestConceptsActifs:
     def test_published_concept_with_fr_en_appears(self, db_conn: Connection) -> None:
@@ -92,10 +91,9 @@ class TestConceptsActifs:
 # v_concepts_traduction_pending
 # ----------------------------------------------------------------------
 
+
 class TestTraductionPending:
-    def test_concept_with_only_en_appears_in_pending(
-        self, db_conn: Connection
-    ) -> None:
+    def test_concept_with_only_en_appears_in_pending(self, db_conn: Connection) -> None:
         cid = _create_concept(
             db_conn,
             "https://w3id.org/nephos/vocab/grandeurs/foo",
@@ -114,9 +112,7 @@ class TestTraductionPending:
             assert row[0] is False
             assert row[1] is True
 
-    def test_concept_with_fr_and_en_does_not_appear(
-        self, db_conn: Connection
-    ) -> None:
+    def test_concept_with_fr_and_en_does_not_appear(self, db_conn: Connection) -> None:
         cid = _create_concept(
             db_conn,
             "https://w3id.org/nephos/vocab/grandeurs/foo",
@@ -127,8 +123,7 @@ class TestTraductionPending:
         _add_pref_label(db_conn, cid, "en", "Foo")
         with db_conn.cursor() as cur:
             cur.execute(
-                "SELECT COUNT(*) FROM vocab.v_concepts_traduction_pending "
-                "WHERE concept_id = %s",
+                "SELECT COUNT(*) FROM vocab.v_concepts_traduction_pending WHERE concept_id = %s",
                 (cid,),
             )
             row = cur.fetchone()
@@ -139,14 +134,13 @@ class TestTraductionPending:
 # v_concept_descendants / v_concept_ancestors
 # ----------------------------------------------------------------------
 
+
 class TestRecursiveResolution:
     def test_descendants_at_depth_2(self, db_conn: Connection) -> None:
         # racine : Température
         # enfant : Température de l'air (broader → Température)
         # petit-enfant : Température à 2 m (broader → Température de l'air)
-        c_root = _create_concept(
-            db_conn, "https://w3id.org/nephos/vocab/grandeurs/temp", "temp"
-        )
+        c_root = _create_concept(db_conn, "https://w3id.org/nephos/vocab/grandeurs/temp", "temp")
         c_air = _create_concept(
             db_conn, "https://w3id.org/nephos/vocab/grandeurs/temp_air", "temp_air"
         )
@@ -169,9 +163,7 @@ class TestRecursiveResolution:
             assert rows[1] == (c_2m, 2)
 
     def test_ancestors_at_depth_2(self, db_conn: Connection) -> None:
-        c_root = _create_concept(
-            db_conn, "https://w3id.org/nephos/vocab/grandeurs/temp", "temp"
-        )
+        c_root = _create_concept(db_conn, "https://w3id.org/nephos/vocab/grandeurs/temp", "temp")
         c_air = _create_concept(
             db_conn, "https://w3id.org/nephos/vocab/grandeurs/temp_air", "temp_air"
         )
@@ -198,12 +190,8 @@ class TestRecursiveResolution:
         ou par import bogué, deux concepts se pointent mutuellement comme
         broader (la table n'interdit pas les cycles, mais la vue les traite).
         """
-        c1 = _create_concept(
-            db_conn, "https://w3id.org/nephos/vocab/test/c1", "c1"
-        )
-        c2 = _create_concept(
-            db_conn, "https://w3id.org/nephos/vocab/test/c2", "c2"
-        )
+        c1 = _create_concept(db_conn, "https://w3id.org/nephos/vocab/test/c1", "c1")
+        c2 = _create_concept(db_conn, "https://w3id.org/nephos/vocab/test/c2", "c2")
         _add_broader(db_conn, c1, c2)
         _add_broader(db_conn, c2, c1)
 
@@ -223,6 +211,7 @@ class TestRecursiveResolution:
 # ----------------------------------------------------------------------
 # v_concepts_mesurables
 # ----------------------------------------------------------------------
+
 
 class TestConceptsMesurables:
     def test_concept_with_physical_appears(self, db_conn: Connection) -> None:
@@ -260,9 +249,7 @@ class TestConceptsMesurables:
             assert row[2] == -90
             assert row[3] == 60
 
-    def test_concept_without_physical_does_not_appear(
-        self, db_conn: Connection
-    ) -> None:
+    def test_concept_without_physical_does_not_appear(self, db_conn: Connection) -> None:
         cid = _create_concept(
             db_conn,
             "https://w3id.org/nephos/vocab/phenomenes/orage",

@@ -73,9 +73,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/nephos"]
 
-# ----- uv (gestionnaire de dépendances) -----
-[tool.uv]
-dev-dependencies = [
+# ----- Dependency groups (PEP 735) — remplace l'ancien [tool.uv].dev-dependencies -----
+[dependency-groups]
+dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "pytest-postgresql>=6.0",
@@ -188,13 +188,42 @@ backup = false
 # ----- Deptry (dépendances inutilisées ou manquantes) -----
 [tool.deptry]
 known_first_party = ["nephos"]
-extend_exclude = ["tests"]
+extend_exclude = ["tests", "alembic"]
+
 [tool.deptry.per_rule_ignores]
+# DEP002 : dépendances déclarées mais non encore importées.
+# Beaucoup de runtime-deps sont prévues pour les sprints d'import
+# (E4-*, E5-*, E6-*) — on les retire de cette liste à mesure
+# qu'elles entrent dans le code.
 DEP002 = [
-    # Dépendances utilisées dynamiquement ou via entry points,
-    # à compléter au fur et à mesure de l'implémentation.
+    # Sprint 2 — pipeline d'import
+    "rdflib",
+    "lxml",
+    "requests",
+    "sparqlwrapper",
+    # Sprint 3 — validation
+    "pyshacl",
+    # Utilisées via entry points / commandes (pas d'import direct)
     "psycopg",
     "alembic",
+    # Dev-deps non reconnues comme telles via PEP 735 dans la version
+    # actuelle de deptry. À supprimer dès que deptry > 0.21 supporte
+    # mieux les dependency-groups.
+    "pytest",
+    "pytest-cov",
+    "pytest-postgresql",
+    "hypothesis",
+    "mutmut",
+    "ruff",
+    "mypy",
+    "types-requests",
+    "bandit",
+    "pip-audit",
+    "deptry",
+    "interrogate",
+    "vulture",
+    "validate-pyproject",
+    "pre-commit",
 ]
 
 # ----- Interrogate (couverture des docstrings) -----

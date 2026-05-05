@@ -7,6 +7,16 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ## [Non publié]
 
+### Corrigé
+
+- **`schema_v4_skos.sql`** — bug bloquant détecté lors de la première application réelle sur PostgreSQL 16. La contrainte `UNIQUE (source_concept_id, target_concept_id, relation, COALESCE(scheme_id, 0))` sur `vocab.concept_semantic_relation` est invalide en PostgreSQL (les expressions ne sont pas autorisées dans une contrainte UNIQUE inline). Remplacée par un `CREATE UNIQUE INDEX uq_csr_relation_scope` séparé, qui accepte les expressions. Bug attrapé par `docker compose up postgres` lors de l'installation des outils.
+- **`src/nephos/cli.py`** — `nephos --version` renvoyait exit code 2 (Typer considérait la sous-commande manquante malgré la callback). Ajout de `invoke_without_command=True` à l'application racine. Test `test_version_flag_prints_version` désormais vert.
+
+### Modifié
+
+- **`pyproject.toml`** — migration de `[tool.uv].dev-dependencies` (déprécié) vers `[dependency-groups].dev` (PEP 735). Aucun changement fonctionnel.
+- **Formatage Ruff** : 4 fichiers reformatés et 7 patterns `with` imbriqués combinés en `with A, B:` après `ruff check --fix && ruff format`. Tests, mypy strict et ruff désormais tous verts (46/46 tests passent localement contre PostgreSQL 16 dans docker-compose).
+
 ### Ajouté
 
 - **`Dockerfile`** multi-stage (E3-08) :
