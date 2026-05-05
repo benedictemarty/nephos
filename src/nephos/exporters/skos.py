@@ -99,9 +99,8 @@ class SKOSExporter:
     ) -> ExportResult:
         graph, stats = self.build_graph(conn, scheme_code=scheme_code)
         rdflib_format = "turtle" if fmt == "turtle" else fmt
-        payload = graph.serialize(format=rdflib_format)
-        if isinstance(payload, bytes):
-            payload = payload.decode("utf-8")
+        # `graph.serialize` retourne `str` selon les stubs rdflib modernes.
+        payload = str(graph.serialize(format=rdflib_format))
         return ExportResult(
             format=fmt,
             nb_concepts=stats["nb_concepts"],
