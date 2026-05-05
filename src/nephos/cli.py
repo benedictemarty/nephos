@@ -463,5 +463,71 @@ def validate_quality(
         raise typer.Exit(code=2)
 
 
+@validate_app.command("all")
+def validate_all(
+    scheme: Annotated[
+        str | None,
+        typer.Option("--scheme", help="Limite la validation à un scheme (code)."),
+    ] = None,
+    treat_as_published: Annotated[
+        bool,
+        typer.Option(
+            "--strict",
+            help="Force la validation SHACL en mode publié (impose FR+EN, ADR 0004).",
+        ),
+    ] = False,
+    fail_on_error: Annotated[
+        bool,
+        typer.Option(
+            "--fail-on-error",
+            help="Exit 2 si SHACL non conforme OU quality détecte ≥ 1 erreur (E5-05).",
+        ),
+    ] = False,
+) -> None:
+    """Validation combinée SHACL + qualité sur un sous-ensemble du référentiel (E5-05).
+
+    Cible alignée avec les commandes individuelles `validate shacl` et
+    `validate quality` mais expose un point d'entrée unique pour la
+    CI / le pipeline ETL : un seul code de retour, deux rapports
+    successifs, même filtre `--scheme`.
+    """
+    from nephos.db import connect
+    from nephos.validators import QualityReporter, SHACLValidator
+
+    shacl_validator = SHACLValidator(treat_as_published=treat_as_published)
+    quality_reporter = QualityReporter(scheme_code=scheme)
+
+    with connect() as conn:
+        shacl_report = shacl_validator.validate(conn, scheme_code=scheme)
+        quality_report = quality_reporter.run(conn)
+
+    summary_title = "Validation combinée Nephos"
+    if scheme:
+        summary_title += f" (scheme={scheme})"
+    summary = Table(title=summary_title)
+    summary.add_column("Étape", style="cyan")
+    summary.add_column("Indicateur")
+    summary.add_column("Valeur", justify="right")
+    summary.add_row(
+        "SHACL", "Conforme", "[green]oui[/green]" if shacl_report.conforms else "[red]non[/red]"
+    )
+    summary.add_row("SHACL", "Concepts validés", str(shacl_report.concepts_validated))
+    summary.add_row("SHACL", "Violations", str(shacl_report.violations))
+    summary.add_row("SHACL", "Warnings", str(shacl_report.warnings))
+    summary.add_row(
+        "Qualité",
+        "Erreurs structurelles",
+        f"[red]{sum(f.count for f in quality_report.findings if f.severity == 'error')}[/red]"
+        if quality_report.has_errors
+        else "[green]0[/green]",
+    )
+    summary.add_row("Qualité", "Total anomalies", str(quality_report.total_anomalies))
+    console.print(summary)
+
+    has_failure = (not shacl_report.conforms) or quality_report.has_errors
+    if fail_on_error and has_failure:
+        raise typer.Exit(code=2)
+
+
 if __name__ == "__main__":  # pragma: no cover
     app()
