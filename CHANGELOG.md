@@ -9,6 +9,14 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Bootstrap projet Python** :
+  - `pyproject.toml` configuré pour `uv` + Hatchling (build), avec dépendances cibles (`rdflib`, `pyshacl`, `lxml`, `requests`, `SPARQLWrapper`, `pydantic`, `pydantic-settings`, `psycopg[binary]`, `typer`, `rich`, `alembic`) et dev (`pytest`, `pytest-cov`, `pytest-postgresql`, `ruff`, `mypy`, `pre-commit`).
+  - Layout `src/nephos/` (package importable, `__main__.py`, `py.typed` pour le typage publié).
+  - `src/nephos/config.py` — configuration typée (`pydantic-settings`) avec préfixe d'environnement `NEPHOS_`.
+  - `src/nephos/cli.py` — CLI Typer avec sous-commandes `info`, `import {status,cf}`, `db {apply,upgrade}`, `export turtle`, `validate shacl`. Les sous-commandes non implémentées affichent un message clair avec pointeur vers l'item de backlog.
+  - `.env.example` — modèle de configuration commentée.
+  - `tests/__init__.py` — squelette pour les tests à venir.
+  - Couvre les items `E3-01`, `E3-02`, `E3-03`, `E3-04` du backlog.
 - **`docs/adr/template.md`** — gabarit MADR 4.0 pour les futurs ADR. 8 sections (contexte, drivers, options, décision, conséquences, pros/cons des options écartées, validation, références) avec consignes d'usage. Couvre l'item `E1-07` du backlog.
 - **`schema_v4_skos.sql`** — schéma PostgreSQL refondu sur SKOS Core. Trois étages : SKOS Core (`scheme`, `concept`, `concept_label`, `concept_in_scheme`, `concept_semantic_relation`, `concept_note`, `concept_mapping`), extension typage physique (`concept_physical`, `unite`), bloc gouvernance refondu. Triggers d'audit posés sur `scheme`, `concept`, `unite`. Sept vues métier (`v_concepts_actifs`, `v_concepts_mesurables`, `v_concept_descendants`, `v_concept_ancestors`, `v_proposals_pending`, `v_audit_recent`, `v_imports_status`, `v_concepts_traduction_pending`). Couvre les items `E2-01`, `E2-02`, `E2-03`, `E2-05`, `E2-06`.
 - Avertissement de dépréciation ajouté en tête de `schema_referentiel_v3.sql` (item `E2-11` traité — conservé en référence).
