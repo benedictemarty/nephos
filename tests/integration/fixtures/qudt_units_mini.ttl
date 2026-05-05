@@ -1,0 +1,55 @@
+# Fixture QUDT mini — 4 unités représentatives extraites de QUDT 2.1.47.
+# Utilisée par tests/integration/test_importer_qudt_units.py.
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sou: <http://qudt.org/vocab/sou/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://qudt.org/2.1/vocab/unit>
+    a owl:Ontology ;
+    rdfs:label "QUDT VOCAB Units of Measure Release 2.1.47" .
+
+unit:K
+    a qudt:Unit ;
+    qudt:symbol "K" ;
+    rdfs:label "Kelvin"@en ;
+    dcterms:description "The kelvin is the SI base unit of thermodynamic temperature." ;
+    qudt:applicableSystem sou:SI ;
+    qudt:conversionMultiplier 1.0 ;
+    qudt:hasQuantityKind quantitykind:Temperature ;
+    qudt:hasQuantityKind quantitykind:ThermodynamicTemperature .
+
+unit:PA
+    a qudt:Unit ;
+    qudt:symbol "Pa" ;
+    rdfs:label "Pascal"@en ;
+    dcterms:description "The pascal is the SI derived unit of pressure." ;
+    qudt:applicableSystem sou:SI ;
+    qudt:conversionMultiplier 1.0 ;
+    qudt:hasQuantityKind quantitykind:Pressure .
+
+unit:M-PER-SEC
+    a qudt:Unit ;
+    qudt:symbol "m/s" ;
+    rdfs:label "Metre per second"@en ;
+    dcterms:description "Velocity unit derived from metre and second." ;
+    qudt:applicableSystem sou:SI ;
+    qudt:conversionMultiplier 1.0 ;
+    qudt:hasQuantityKind quantitykind:LinearVelocity ;
+    qudt:hasQuantityKind quantitykind:Speed .
+
+unit:DEG_C
+    a qudt:Unit ;
+    qudt:symbol "°C" ;
+    rdfs:label "Degree Celsius"@en ;
+    dcterms:description "The degree Celsius is a unit of temperature on the Celsius scale." ;
+    qudt:applicableSystem sou:SI ;
+    qudt:conversionMultiplier 1.0 ;
+    qudt:conversionOffset 273.15 ;
+    qudt:hasQuantityKind quantitykind:Temperature .
