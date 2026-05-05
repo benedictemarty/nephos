@@ -265,6 +265,7 @@ def _run_and_print(importer: object, dry_run: bool, title: str) -> None:
     table.add_row("Modifications", str(result.nb_modifications))
     table.add_row("Inchangées", str(result.nb_skipped))
     table.add_row("Overrides protégés", str(result.nb_overrides_protected))
+    table.add_row("Deprecated (disparus)", str(result.nb_deprecated_disappeared))
     if result.notes:
         table.add_row("Notes", result.notes)
     console.print(table)

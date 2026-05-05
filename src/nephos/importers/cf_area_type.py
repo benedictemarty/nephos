@@ -83,6 +83,10 @@ class CFAreaTypeImporter(Importer):
         self._source: str | Path = source if source is not None else CF_AREA_DEFAULT_URL
         self._cached_root: etree._Element | None = None
 
+    def target_scheme_codes(self) -> tuple[str, ...]:
+        """Détection des disparus active sur le scheme `area-types-cf` (E4-08)."""
+        return (CF_AREA_SCHEME_CODE,)
+
     def discover_version(self) -> str:
         root = self._fetch()
         version = root.findtext("version_number")

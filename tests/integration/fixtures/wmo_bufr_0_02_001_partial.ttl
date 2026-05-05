@@ -1,0 +1,24 @@
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix reg:   <http://purl.org/linked-data/registry#> .
+@prefix ldp:   <http://www.w3.org/ns/ldp#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://codes.wmo.int/bufr4/codeflag/0-02-001/0>
+        a              skos:Concept ;
+        rdfs:label     "Automatic"@en ;
+        skos:notation  0 .
+
+<http://codes.wmo.int/bufr4/codeflag/0-02-001/1>
+        a              skos:Concept ;
+        rdfs:label     "Manned"@en ;
+        skos:notation  1 .
+
+<http://codes.wmo.int/bufr4/codeflag/0-02-001>
+        a                        reg:Register , skos:Collection , ldp:Container ;
+        rdfs:label               "Type of station (partial)" ;
+        dct:modified             "2026-01-01T00:00:00.000Z"^^xsd:dateTime ;
+        skos:member              <http://codes.wmo.int/bufr4/codeflag/0-02-001/0> ,
+                                 <http://codes.wmo.int/bufr4/codeflag/0-02-001/1> ;
+        ldp:membershipPredicate  skos:member .

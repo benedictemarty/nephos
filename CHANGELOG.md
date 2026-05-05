@@ -9,6 +9,12 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Détection des concepts disparus côté source** (E4-08) — règle « jamais de DELETE, toujours `status='deprecated'` ».
+  - Nouveau module `nephos.etl.deprecation` avec `mark_disappeared_concepts(conn, source_id, current_version, scheme_codes)` qui passe en `deprecated` les concepts dont `import_version` ne correspond plus à la version courante, restreints à `scheme_codes`. Sécurité : `scheme_codes` vide ⇒ no-op (refus de marquer toute la base).
+  - Nouvel hook `Importer.target_scheme_codes() -> tuple[str, ...] | None` (default `None` = désactivé). Déclaré par `CFStandardNamesImporter` (`grandeurs-cf`), `CFAreaTypeImporter` (`area-types-cf`), `WMOCodesImporter` (scheme courant). `QUDTUnitsImporter` reste opt-out (touche `vocab.unite`).
+  - Intégration `ImportRunner` automatique entre `load` et validation SHACL ; option `RunOptions.detect_disappeared=True` par défaut. Préservation explicite des concepts `has_local_override = TRUE`.
+  - Nouveau champ `ImportResult.nb_deprecated_disappeared` ; ligne « Deprecated (disparus) » dans la sortie Rich CLI.
+  - 6 tests d'intégration (`tests/integration/test_etl_deprecation.py`) avec fixture amputée `wmo_bufr_0_02_001_partial.ttl` : nominal sans disparus, 2 disparus marqués, override protégé, désactivation via `RunOptions`, scheme isolation cross-source (autre scheme WMO préservé), `scheme_codes=()` no-op.
 - **Import WMO Codes Registry** (E4-05) — `nephos.importers.wmo_codes.WMOCodesImporter`, importer paramétrable pour les code lists publiées en SKOS/Turtle par https://codes.wmo.int.
   - Constructeur : `WMOCodesImporter(register_url=..., scheme_code=..., scheme_title=...)`. Helper `from_preset(key)` pour les presets fournis.
   - 4 presets initiaux (BUFR section commune) : `bufr-0-02-001` (Type of station), `bufr-0-02-002` (Type of instrumentation for wind measurement), `bufr-0-02-003` (Type of measuring equipment used), `bufr-0-08-021` (Time significance).

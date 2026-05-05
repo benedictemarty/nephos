@@ -53,6 +53,12 @@ class RunOptions:
     levée. Sinon, les violations sont consignées en notes mais n'arrêtent
     pas le pipeline."""
 
+    detect_disappeared: bool = True
+    """Marque en `deprecated` les concepts présents en base mais absents
+    de la nouvelle version (E4-08). Effectif uniquement si l'importer
+    déclare ses `target_scheme_codes()`. Les concepts avec
+    `has_local_override = TRUE` sont préservés."""
+
 
 class ImportRunner:
     """Orchestrateur générique d'imports."""
@@ -110,6 +116,8 @@ class ImportRunner:
                     raw = self.importer.extract()
                     entries = self.importer.transform(raw)
                     result = self.importer.load(conn, entries, version)
+                    if opts.detect_disappeared:
+                        result = self._mark_disappeared(conn, result, version)
                     if opts.validate_after:
                         result = self._run_validation(conn, result, strict=opts.strict_validation)
                     close_run(conn, entry, result)
@@ -161,6 +169,36 @@ class ImportRunner:
             nb_entites=len(entries),
             notes="dry-run — aucune écriture",
         )
+
+    def _mark_disappeared(
+        self,
+        conn: psycopg.Connection,
+        result: ImportResult,
+        version: str,
+    ) -> ImportResult:
+        """Marque en `deprecated` les concepts disparus côté source (E4-08).
+
+        No-op si l'importer ne déclare pas ses `target_scheme_codes`
+        (cas par défaut sécuritaire — ex. ``QUDTUnitsImporter`` qui
+        n'alimente pas ``vocab.concept``).
+        """
+        from nephos.etl.deprecation import _resolve_source_id, mark_disappeared_concepts
+
+        scheme_codes = self.importer.target_scheme_codes()
+        if scheme_codes is None:
+            return result
+        source_id = _resolve_source_id(conn, str(self.importer.source_code))
+        nb = mark_disappeared_concepts(
+            conn,
+            source_id=source_id,
+            current_version=version,
+            scheme_codes=scheme_codes,
+        )
+        result.nb_deprecated_disappeared = nb
+        if nb:
+            suffix = f"{nb} concept(s) marqué(s) deprecated (disparus côté source)"
+            result.notes = (result.notes + " | " + suffix) if result.notes else suffix
+        return result
 
     def _run_validation(
         self,
