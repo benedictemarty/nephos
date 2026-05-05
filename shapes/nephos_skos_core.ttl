@@ -1,0 +1,103 @@
+# Shapes SHACL Nephos — niveau Core (E5-01).
+#
+# Valide les invariants SKOS et Nephos sur les concepts du référentiel.
+# Voir CONTRIBUTING.md, ADR 0001 (SKOS), ADR 0003 (URI), ADR 0004
+# (multilingue), ADR 0010 (validation).
+#
+# Convention : la sévérité par défaut est sh:Violation (bloque la
+# publication). Quelques shapes utilisent sh:Warning ou sh:Info pour
+# signaler sans bloquer (ex. langues étendues opportunistes).
+
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix nephos: <https://w3id.org/nephos/shapes/> .
+
+# ----------------------------------------------------------------------
+# 1. URI des concepts — doit suivre la convention Nephos (ADR 0003).
+# ----------------------------------------------------------------------
+
+nephos:ConceptUriShape
+    a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "^https://w3id\\.org/nephos/vocab/" ;
+    sh:flags "" ;
+    sh:message "L'URI d'un concept doit commencer par https://w3id.org/nephos/vocab/ (ADR 0003)." ;
+    sh:severity sh:Violation .
+
+# ----------------------------------------------------------------------
+# 2. Notation — minuscules + chiffres + `_` ou `-` uniquement (ADR 0003).
+# ----------------------------------------------------------------------
+
+nephos:ConceptNotationShape
+    a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    sh:property [
+        sh:path skos:notation ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:pattern "^[a-z0-9][a-z0-9_-]*$" ;
+        sh:message "La notation doit correspondre à ^[a-z0-9][a-z0-9_-]*$ (ADR 0003)." ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ----------------------------------------------------------------------
+# 3. prefLabel — au moins un, sans dépasser un par langue (SKOS standard).
+# ----------------------------------------------------------------------
+
+nephos:ConceptPrefLabelShape
+    a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:minCount 1 ;
+        sh:message "Tout concept doit avoir au moins un skos:prefLabel." ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:uniqueLang true ;
+        sh:message "Au plus un skos:prefLabel par langue (SKOS S14)." ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ----------------------------------------------------------------------
+# 4. Concept publié → prefLabel@fr ET prefLabel@en (ADR 0004).
+#    Filtre : ne s'applique qu'aux concepts dont skos:notation est
+#    portée et qui ont un statut publié (matérialisé via
+#    sh:targetClass + sh:condition).
+# ----------------------------------------------------------------------
+
+nephos:PublishedConceptShape
+    a sh:NodeShape ;
+    sh:targetClass nephos:PublishedConcept ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "fr" ) ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:message "Un concept publié doit avoir un skos:prefLabel@fr (ADR 0004)." ;
+        sh:severity sh:Violation ;
+    ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:message "Un concept publié doit avoir un skos:prefLabel@en (ADR 0004)." ;
+        sh:severity sh:Violation ;
+    ] .
+
+# ----------------------------------------------------------------------
+# 5. broader / narrower — pas de relation sur soi-même (SKOS S27).
+# ----------------------------------------------------------------------
+
+nephos:NoSelfBroaderShape
+    a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    sh:property [
+        sh:path skos:broader ;
+        sh:disjoint sh:this ;
+        sh:message "Un concept ne peut pas être skos:broader de lui-même (SKOS S27)." ;
+        sh:severity sh:Violation ;
+    ] .

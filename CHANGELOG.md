@@ -9,6 +9,15 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Validation SHACL des concepts** (E5-01) — premier validateur sémantique Nephos.
+  - `shapes/nephos_skos_core.ttl` — 5 shapes SHACL : URI Nephos (ADR 0003), notation regex (ADR 0003), prefLabel ≥ 1 + `uniqueLang` (SKOS S14), `PublishedConcept` virtuel imposant FR+EN (ADR 0004), pas de self-broader (SKOS S27).
+  - `nephos.validators.shacl_runner.SHACLValidator` — charge les concepts publiés/approuvés depuis Postgres comme graphe RDF (concept, notation, prefLabel multilingue, broader internes), applique pyshacl avec les shapes Core et retourne un `SHACLValidationReport` structuré (conforms, concepts validés, violations/warnings/infos, rapport texte complet).
+  - Mode `treat_as_published=True` (option CLI `--strict`) : force tous les concepts à être validés contre la shape `PublishedConcept`. Sert à identifier la **file d'attente de traduction FR** sur les imports automatiques.
+  - Filtrage par scheme (`--scheme CODE`) pour cibler une partie du référentiel.
+  - CLI : `nephos validate shacl [--scheme CODE] [--strict] [--report]`. Sortie Rich avec compteurs ; option `--report` affiche le rapport pyshacl complet en cas de non-conformité.
+  - 5 tests d'intégration : concept conforme, concept sans prefLabel viole, mode strict impose FR+EN, filtre scheme isole le sous-graphe, base vide reste conforme.
+  - **Validation live** sur le pipeline complet (QUDT puis CF) : 5023 concepts CF conformes en mode normal (URI valides, notations conformes, prefLabel@en présents, pas de self-broader). En mode `--strict`, 5023 violations attendues — la file de traduction FR est identifiée par construction.
+
 - **Mapping symboles CF↔QUDT** (E4-04b) — `nephos.importers._unit_symbols.normalize_cf_to_qudt(s)` :
   - Convertit la notation CF (tokens séparés par espaces, exposants signés sans `^`) vers la notation QUDT (numérateur·...· / dénominateur, exposants Unicode).
   - Cas couverts : ``"m s-1"`` → ``"m/s"``, ``"kg m-2 s-1"`` → ``"kg/(m²·s)"``, ``"W m-2 K-1"`` → ``"W/(m²·K)"``, ``"m2 s-2"`` → ``"m²/s²"``, conservation des cas triviaux (``K``, ``Pa``, ``1``, ``%``, ``°C``).
