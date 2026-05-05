@@ -934,6 +934,7 @@ dependencies = [
     { name = "rdflib" },
     { name = "requests" },
     { name = "rich" },
+    { name = "skosify" },
     { name = "sparqlwrapper" },
     { name = "typer" },
 ]
@@ -1001,6 +1002,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32" },
     { name = "rich", specifier = ">=13.7" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
+    { name = "skosify", specifier = ">=2.3.0" },
     { name = "sparqlwrapper", specifier = ">=2.0" },
     { name = "typer", specifier = ">=0.12" },
     { name = "types-requests", marker = "extra == 'dev'" },
@@ -1716,6 +1718,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/58/15/8b3609fd3830ef7b27b655beb4b4e9c62313a4e8da8c676e142cc210d58e/shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de", size = 10310, upload-time = "2023-10-24T04:13:40.426Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e0/f9/0595336914c5619e5f28a1fb793285925a8cd4b432c9da0a987836c7f822/shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686", size = 9755, upload-time = "2023-10-24T04:13:38.866Z" },
+]
+
+[[package]]
+name = "skosify"
+version = "2.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "rdflib" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/61/066294d0711ddf554e67e8185006b9e67530e59f11f96a3e9120ac3ff148/skosify-2.3.0.tar.gz", hash = "sha256:012beee78f23038edbb5783f7163afb3fedd2d8a0b68cfc2408566df59bb5611", size = 25631, upload-time = "2021-08-31T10:51:52.158Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/5f/8bb413d47d091d7f0ee3940a7429daf82a54a68a89ca3f295b8e7b8d48fb/skosify-2.3.0-py2.py3-none-any.whl", hash = "sha256:c147043c2abe9ca64489eca0f8a5ca891b84118d298027e40287bdd6819668d4", size = 23012, upload-time = "2021-08-31T10:51:50.597Z" },
 ]
 
 [[package]]
