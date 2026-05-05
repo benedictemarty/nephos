@@ -9,8 +9,9 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
-- **ADR 0014 — Adapter la chaîne de revue au cas du mainteneur unique** (`docs/adr/0014-adapter-protection-pour-mainteneur-unique.md`). **Supersède partiellement ADR 0011** sur le seul paramètre `required_pull_request_reviews.required_approving_review_count` (passage de `1` à `0`). Tous les autres verrous d'ADR 0011 sont préservés (PR obligatoire, 7 status checks requis, linear history, no force push, no deletion, no admin bypass, conversation resolution). Documente les conditions de retour automatique à `1` (CR1 second mainteneur ajouté, CR2 organisation multi-membres). Compense partiellement la dégradation par les autres niveaux de la chaîne (CI verte obligatoire, agent reviewer ADR 0013, auto-discipline du mainteneur). Items `E1-13` (cet amendement) et `E1-14` (procédure de retour) ajoutés au backlog.
-- **Mention spécifique** dans `CONTRIBUTING.md` du cas mainteneur unique, pointant vers ADR 0014.
+- **ADR 0013 — Adopter Claude Code GitHub Action comme agent reviewer** (`docs/adr/0013-agent-reviewer-claude-code-action.md`). Acte le choix de `anthropics/claude-code-action@v1` authentifié via OAuth Max (sans coût marginal au token), pour produire à chaque ouverture/synchronisation de PR un rapport structuré en 6 sections + verdict explicite. Le rapport est un **éclairage** pour le reviewer humain — pas un statut bloquant ni un droit de merge. Hors-périmètre : auto-approval, persistance des rapports, PRs depuis forks externes (à traiter ultérieurement avec un workflow `pull_request_target` sécurisé séparé).
+- **`.github/workflows/agent-review.yml`** — workflow d'exécution de l'agent reviewer. Triggers : `pull_request: [opened, synchronize, reopened]` (volontairement pas `pull_request_target` pour ne pas exposer le secret OAuth aux PR depuis forks) + `workflow_dispatch` pour relance manuelle. Concurrence par branche avec `cancel-in-progress`. Permissions minimales : `contents: read`, `pull-requests: write`, `issues: write`. Pas de droit de merge ni d'écriture sur le code. Skip des PRs en draft pour économiser le quota Max. Prompt versionné qui charge le contexte ADR pertinent et impose le format de rapport (6 sections + verdict).
+- Item `E1-12` du backlog marqué ✅ (l'activation effective dépend de l'ajout du secret `CLAUDE_CODE_OAUTH_TOKEN` côté GitHub par le mainteneur — étape manuelle, validée dans la procédure de l'ADR 0013).
 
 ### Ajouté (suite)
 
@@ -135,4 +136,5 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 | [0010](docs/adr/0010-nephos-comme-moteur-de-validation.md) | Étendre le périmètre aux outils de validation (GRIB, NetCDF, BUFR…) | Accepté |
 | [0011](docs/adr/0011-protection-technique-branche-main.md) | Protection technique de la branche `main` (Branch Protection Rules) | Accepté |
 | [0012](docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md) | Gestion de la vulnérabilité PYSEC-2022-42969 (paquet `py` EOL) | Accepté |
+| [0013](docs/adr/0013-agent-reviewer-claude-code-action.md) | Adopter Claude Code GitHub Action comme agent reviewer | Accepté |
 | [0014](docs/adr/0014-adapter-protection-pour-mainteneur-unique.md) | Adapter la chaîne de revue au cas du mainteneur unique (supersède partiellement 0011) | Accepté |

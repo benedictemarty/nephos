@@ -157,6 +157,7 @@ Voir l'en-tête commenté de `schema_v4_skos.sql` pour la lecture détaillée.
 | [0010](docs/adr/0010-nephos-comme-moteur-de-validation.md) | Étendre le périmètre aux outils de validation (GRIB, NetCDF, BUFR…) | Accepté |
 | [0011](docs/adr/0011-protection-technique-branche-main.md) | Protection technique de la branche `main` (Branch Protection Rules) | Accepté |
 | [0012](docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md) | Gestion de la vulnérabilité PYSEC-2022-42969 (paquet `py` EOL) | Accepté |
+| [0013](docs/adr/0013-agent-reviewer-claude-code-action.md) | Adopter Claude Code GitHub Action comme agent reviewer | Accepté |
 | [0014](docs/adr/0014-adapter-protection-pour-mainteneur-unique.md) | Adapter la chaîne de revue au cas du mainteneur unique (supersède partiellement 0011) | Accepté |
 
 ---
