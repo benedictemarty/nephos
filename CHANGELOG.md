@@ -9,6 +9,13 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Outillage qualité, sécurité et tests étendu** :
+  - `.pre-commit-config.yaml` complet : hooks hygiène (EOF, trailing whitespace, large files, JSON/YAML/TOML/symlinks/case conflict, detect-private-key), `gitleaks` (détection de secrets), `ruff` (lint + format), `mypy` (typage strict), `bandit` (analyse de sécurité statique), `deptry` (dépendances inutilisées ou manquantes), `validate-pyproject`, `yamllint`, `markdownlint-cli`, `sqlfluff` (final newline sur le schéma SQL).
+  - `pyproject.toml` enrichi en dev-deps : `hypothesis` (property-based testing), `mutmut` (mutation testing), `bandit[toml]`, `pip-audit` (CVE des dépendances), `deptry`, `interrogate` (couverture docstrings, seuil 70 %), `vulture` (dead code), `validate-pyproject[all]`.
+  - Sections de configuration ajoutées : `[tool.bandit]`, `[tool.mutmut]`, `[tool.deptry]`, `[tool.interrogate]`, `[tool.vulture]`.
+  - `.yamllint.yaml` et `.markdownlint.yaml` — configurations adaptées au projet (lignes longues tolérées, plusieurs H1 acceptés pour CHANGELOG/BACKLOG, `truthy` désactivé pour les workflows GitHub Actions).
+  - Outils hors pre-commit (trop lents ou usage spécifique) documentés en tête du fichier : mutmut (CI nightly ou manuel), pip-audit (CI), vulture (manuel), interrogate (CI).
+  - Couvre l'item `E3-06` du backlog.
 - **ADR 0010** — Étendre le périmètre Nephos aux outils de validation et de qualité de données (`docs/adr/0010-nephos-comme-moteur-de-validation.md`). Acte que Nephos absorbe les outils consommateurs qui exploitent le référentiel pour qualifier des fichiers externes (GRIB, NetCDF, BUFR…), sous trois invariants : aucun stockage d'instances, aucune modification automatique du référentiel, lecture seule. Réponse à la question d'usage : « valider un fichier GRIB depuis la base ».
 - **EPIC 10 — Outils de validation et qualité de données** ajouté au backlog avec 8 items (`E10-01` à `E10-08`) couvrant l'architecture plugin, les validateurs GRIB / NetCDF-CF / BUFR, le mode `--suggest` qui génère des propositions de mappings manquants, et une action GitHub publiable pour usage en CI tiers.
 - **Bootstrap projet Python** :

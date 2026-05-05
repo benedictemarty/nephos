@@ -36,12 +36,25 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    # Tests
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "pytest-postgresql>=6.0",
+    "hypothesis>=6.112",
+    "mutmut>=3.0",
+    # Lint / format / typage
     "ruff>=0.6",
     "mypy>=1.10",
     "types-requests",
+    # Sécurité
+    "bandit[toml]>=1.7",
+    "pip-audit>=2.7",
+    # Qualité du code et des dépendances
+    "deptry>=0.21",
+    "interrogate>=1.7",
+    "vulture>=2.13",
+    "validate-pyproject[all]>=0.23",
+    # Pre-commit driver
     "pre-commit>=3.7",
 ]
 
@@ -66,9 +79,17 @@ dev-dependencies = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "pytest-postgresql>=6.0",
+    "hypothesis>=6.112",
+    "mutmut>=3.0",
     "ruff>=0.6",
     "mypy>=1.10",
     "types-requests",
+    "bandit[toml]>=1.7",
+    "pip-audit>=2.7",
+    "deptry>=0.21",
+    "interrogate>=1.7",
+    "vulture>=2.13",
+    "validate-pyproject[all]>=0.23",
     "pre-commit>=3.7",
 ]
 
@@ -140,3 +161,49 @@ exclude_lines = [
     "if TYPE_CHECKING:",
 ]
 show_missing = true
+
+# ----- Bandit (analyse de sécurité statique) -----
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "venv", "__pycache__"]
+skips = [
+    "B101",  # assert utilisé : OK dans les helpers internes
+]
+
+# ----- Mutmut (mutation testing) — invocation manuelle, pas dans pre-commit -----
+[tool.mutmut]
+paths_to_mutate = "src/nephos/"
+runner = "pytest -x -q"
+tests_dir = "tests/"
+backup = false
+
+# ----- Deptry (dépendances inutilisées ou manquantes) -----
+[tool.deptry]
+known_first_party = ["nephos"]
+extend_exclude = ["tests"]
+[tool.deptry.per_rule_ignores]
+DEP002 = [
+    # Dépendances utilisées dynamiquement ou via entry points,
+    # à compléter au fur et à mesure de l'implémentation.
+    "psycopg",
+    "alembic",
+]
+
+# ----- Interrogate (couverture des docstrings) -----
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-magic = true
+ignore-private = false
+ignore-module = false
+fail-under = 70
+exclude = ["tests", "alembic", ".venv", "venv"]
+verbose = 1
+quiet = false
+color = true
+
+# ----- Vulture (dead code detection) — invocation manuelle (faux positifs) -----
+[tool.vulture]
+paths = ["src/nephos"]
+min_confidence = 80
+exclude = ["tests/"]
+ignore_decorators = ["@app.command", "@app.callback", "@*_app.command"]

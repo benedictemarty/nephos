@@ -1,0 +1,19 @@
+# Configuration yamllint pour Nephos
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  document-start: disable
+  truthy:
+    check-keys: false  # GitHub Actions utilise "on:" qui est un mot réservé YAML
+
+ignore: |
+  .venv/
+  venv/
+  __pycache__/
+  *.egg-info/

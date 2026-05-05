@@ -1,0 +1,105 @@
+# Pre-commit hooks Nephos
+# Installation : pre-commit install
+# Lancement manuel : pre-commit run --all-files
+# Mise à jour : pre-commit autoupdate
+#
+# Outils hors pre-commit (trop lents ou usage spécifique) :
+#   - mutmut       : mutation testing — invoqué manuellement ou en CI nightly
+#   - pip-audit    : vulnérabilités dans les deps — invoqué en CI
+#   - vulture      : dead code — invoqué manuellement (faux positifs fréquents)
+#   - interrogate  : couverture docstrings — invoqué en CI
+
+default_language_version:
+  python: python3.12
+
+repos:
+  # ----- Hygiène basique -----
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-symlinks
+      - id: check-case-conflict
+      - id: end-of-file-fixer
+        exclude: ^LICENSE$
+      - id: trailing-whitespace
+        exclude: ^LICENSE$
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: detect-private-key
+
+  # ----- Détection de secrets (au-delà de detect-private-key) -----
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  # ----- Python : Ruff (lint + format) -----
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.4
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  # ----- Python : Mypy (typage strict sur src/) -----
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        files: ^src/nephos/
+        args: [--config-file=pyproject.toml]
+        additional_dependencies:
+          - pydantic>=2.7
+          - pydantic-settings>=2.4
+          - typer>=0.12
+          - types-requests
+
+  # ----- Python : Bandit (analyse sécurité statique) -----
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        args: [--configfile=pyproject.toml]
+        additional_dependencies: ["bandit[toml]"]
+        files: ^src/nephos/
+
+  # ----- Python : Deptry (dépendances inutilisées ou manquantes) -----
+  - repo: https://github.com/fpgmaas/deptry
+    rev: 0.21.1
+    hooks:
+      - id: deptry
+
+  # ----- Python : validation du pyproject.toml -----
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.23
+    hooks:
+      - id: validate-pyproject
+        additional_dependencies: ["validate-pyproject-schema-store[all]"]
+
+  # ----- YAML : lint -----
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-c=.yamllint.yaml]
+
+  # ----- Markdown : lint -----
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.43.0
+    hooks:
+      - id: markdownlint
+        args: [--config=.markdownlint.yaml]
+
+  # ----- SQL : lint léger (final newline + indentation cohérente) -----
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.2.5
+    hooks:
+      - id: sqlfluff-lint
+        files: ^schema_v4_skos\.sql$
+        args: [--dialect=postgres, --rules=LT12]  # LT12 : final newline

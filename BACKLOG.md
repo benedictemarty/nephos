@@ -80,7 +80,7 @@ Mise en place du squelette technique du backend Python.
 | E3-03 | CLI squelette `nephos --help` avec sous-commandes (`import`, `validate`, `export`, `db`) renvoyant un message « pas encore implémenté » avec pointeur vers l'item de backlog. | P0 | S | E3-02 | ✅ |
 | E3-04 | Configuration applicative typée (URL Postgres, dossiers de travail, log level, uri_base) via `pydantic-settings` + `.env.example`. | P0 | XS | E3-02 | ✅ |
 | E3-05 | Logging structuré (JSON ou key-value) configurable par variable d'environnement. | P1 | XS | E3-04 | 📋 |
-| E3-06 | Pre-commit hooks (`ruff` lint+format, `mypy` strict, `pytest --collect-only`, vérif lockfile à jour). | P0 | S | E3-01 | 📋 |
+| E3-06 | Pre-commit hooks complets : hygiène (EOF, trailing ws, large files, JSON/YAML/TOML), `gitleaks` (secrets), `ruff` (lint+format), `mypy` (typage strict), `bandit` (sécu statique), `deptry` (deps inutilisées/manquantes), `validate-pyproject`, `yamllint`, `markdownlint`, `sqlfluff` (final newline). Mutmut, pip-audit, vulture, interrogate déclarés en dev-deps mais hors pre-commit (invocation CI ou manuelle). Configurations correspondantes dans `pyproject.toml`, `.yamllint.yaml`, `.markdownlint.yaml`. | P0 | M | E3-01 | ✅ |
 | E3-07 | CI GitHub Actions : lint, type-check, tests (avec service Postgres), build d'image. | P0 | M | E3-06 | 📋 |
 | E3-08 | `Dockerfile` multi-stage (build deps → runtime slim). | P1 | S | E3-01 | 📋 |
 | E3-09 | Squelette Alembic configuré (script init, README usage). | P0 | S | E3-01, E3-04 | 📋 |

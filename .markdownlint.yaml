@@ -1,0 +1,18 @@
+# Configuration markdownlint pour Nephos
+default: true
+
+# Lignes longues : on accepte (les ADR contiennent des phrases longues
+# en français qu'il serait artificiel de wrapper).
+MD013: false
+
+# Plusieurs H1 dans le même fichier : on accepte (CHANGELOG, BACKLOG).
+MD025: false
+
+# Code blocks sans langue spécifiée : toléré pour les blocs ASCII art.
+MD040: false
+
+# Bare URLs : tolérées (utiles pour les références dans les ADR).
+MD034: false
+
+# Pas d'emphasis utilisé comme heading : on a quelques cas légitimes.
+MD036: false
