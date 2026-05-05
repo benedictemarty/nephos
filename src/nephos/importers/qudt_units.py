@@ -212,8 +212,8 @@ def _iter_units(graph: rdflib.Graph) -> list[QUDTUnit]:
                 symbol=str(symbol_lit),
                 label=str(label_lit) if label_lit else None,
                 description=(str(description_lit).strip() or None) if description_lit else None,
-                conversion_multiplier=float(mult_lit) if mult_lit is not None else None,
-                conversion_offset=float(offset_lit) if offset_lit is not None else None,
+                conversion_multiplier=float(str(mult_lit)) if mult_lit is not None else None,
+                conversion_offset=float(str(offset_lit)) if offset_lit is not None else None,
                 applicable_systems=applicable_systems,
                 quantity_kinds=quantity_kinds,
             )
