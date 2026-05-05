@@ -115,10 +115,10 @@ class SHACLValidator:
                 (list(ids_tuple),),
             )
             for concept_id, lang, value in cur.fetchall():
-                uri_ref = concept_uris.get(int(concept_id))
-                if uri_ref is None:
+                label_uri: URIRef | None = concept_uris.get(int(concept_id))
+                if label_uri is None:
                     continue
-                graph.add((uri_ref, SKOS.prefLabel, RdfLiteral(value, lang=lang)))
+                graph.add((label_uri, SKOS.prefLabel, RdfLiteral(value, lang=lang)))
 
             cur.execute(
                 "SELECT source_concept_id, target_concept_id "
