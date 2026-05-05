@@ -29,8 +29,16 @@ from nephos.logging import get_logger
 
 logger = get_logger(__name__)
 
-DEFAULT_SHAPES = Path(__file__).resolve().parents[3] / "shapes" / "nephos_skos_core.ttl"
+DEFAULT_SHAPES_DIR = Path(__file__).resolve().parents[3] / "shapes"
+DEFAULT_SHAPES_FILES: tuple[Path, ...] = (
+    DEFAULT_SHAPES_DIR / "nephos_skos_core.ttl",
+    DEFAULT_SHAPES_DIR / "nephos_metier.ttl",
+)
+# Rétrocompatibilité : pointeur sur le premier fichier de shapes.
+DEFAULT_SHAPES = DEFAULT_SHAPES_FILES[0]
 NEPHOS_NS = rdflib.Namespace("https://w3id.org/nephos/shapes/")
+DCTERMS_NS = rdflib.Namespace("http://purl.org/dc/terms/")
+NUMERIC_VALUE_TYPES: frozenset[str] = frozenset({"scalar", "vector", "tensor"})
 
 ValidationOutcome = Literal["conforms", "violations"]
 
@@ -60,12 +68,26 @@ class SHACLValidator:
         *,
         statuses: Iterable[str] = ("approved", "published"),
         treat_as_published: bool = False,
+        shapes_paths: tuple[Path, ...] | None = None,
     ) -> None:
         """`treat_as_published=True` force la validation comme si les
         concepts étaient en statut ``published`` (impose ADR 0004 :
         prefLabel@fr ET @en).
+
+        `shapes_paths` permet de surcharger la liste de fichiers de shapes
+        chargés. Par défaut, charge les shapes Core + métier
+        (E5-01 + E5-02).
         """
-        self._shapes_path = shapes_path or DEFAULT_SHAPES
+        # Rétrocompatibilité : si `shapes_path` (singulier) est passé,
+        # on l'utilise seul.
+        if shapes_paths is not None:
+            self._shapes_paths = shapes_paths
+        elif shapes_path is not None:
+            self._shapes_paths = (shapes_path,)
+        else:
+            self._shapes_paths = DEFAULT_SHAPES_FILES
+        # Conserver l'attribut historique pour les tests qui le lisent.
+        self._shapes_path = self._shapes_paths[0]
         self._statuses = tuple(statuses)
         self._treat_as_published = treat_as_published
 
@@ -134,6 +156,54 @@ class SHACLValidator:
                 if src_uri is not None and tgt_uri is not None:
                     graph.add((src_uri, SKOS.broader, tgt_uri))
 
+            # `skos:inScheme` — appartenance à un scheme (pour la shape métier
+            # nephos:InSchemeShape qui interdit les concepts orphelins).
+            cur.execute(
+                "SELECT cis.concept_id, s.uri "
+                "FROM vocab.concept_in_scheme cis "
+                "JOIN vocab.scheme s ON s.scheme_id = cis.scheme_id "
+                "WHERE cis.concept_id = ANY(%s)",
+                (list(ids_tuple),),
+            )
+            for concept_id, scheme_uri in cur.fetchall():
+                cu = concept_uris.get(int(concept_id))
+                if cu is not None:
+                    graph.add((cu, SKOS.inScheme, URIRef(scheme_uri)))
+
+            # `dcterms:source` — attribution amont (concept.import_source_id).
+            cur.execute(
+                "SELECT c.concept_id, s.url "
+                "FROM vocab.concept c "
+                "JOIN gov.import_sources s ON s.import_source_id = c.import_source_id "
+                "WHERE c.concept_id = ANY(%s) AND s.url IS NOT NULL",
+                (list(ids_tuple),),
+            )
+            for concept_id, source_url in cur.fetchall():
+                cu = concept_uris.get(int(concept_id))
+                if cu is not None:
+                    graph.add((cu, DCTERMS_NS.source, URIRef(source_url)))
+
+            # `concept_physical` → marqueurs métier
+            # nephos:MeasurableConcept + valueType + (NumericMeasurable + hasUnit).
+            cur.execute(
+                "SELECT cp.concept_id, cp.value_type, cp.unit_canonical_id, u.symbole "
+                "FROM vocab.concept_physical cp "
+                "LEFT JOIN vocab.unite u ON u.unite_id = cp.unit_canonical_id "
+                "WHERE cp.concept_id = ANY(%s)",
+                (list(ids_tuple),),
+            )
+            for concept_id, value_type, unit_id, unit_symbol in cur.fetchall():
+                cu = concept_uris.get(int(concept_id))
+                if cu is None:
+                    continue
+                graph.add((cu, rdflib.RDF.type, NEPHOS_NS["MeasurableConcept"]))
+                graph.add((cu, NEPHOS_NS["valueType"], RdfLiteral(str(value_type))))
+                if str(value_type) in NUMERIC_VALUE_TYPES:
+                    graph.add((cu, rdflib.RDF.type, NEPHOS_NS["NumericMeasurableConcept"]))
+                    if unit_id is not None and unit_symbol:
+                        unit_uri = URIRef(f"https://w3id.org/nephos/vocab/units/{unit_symbol}")
+                        graph.add((cu, NEPHOS_NS["hasUnit"], unit_uri))
+
         # Marqueur pour le rapport
         _ = published_class
         return graph
@@ -156,7 +226,9 @@ class SHACLValidator:
                 raw_report="Aucun concept à valider.",
             )
 
-        shapes_graph = rdflib.Graph().parse(source=str(self._shapes_path), format="turtle")
+        shapes_graph = rdflib.Graph()
+        for shape_file in self._shapes_paths:
+            shapes_graph.parse(source=str(shape_file), format="turtle")
         conforms, results_graph, results_text = pyshacl_validate(
             data_graph=data_graph,
             shacl_graph=shapes_graph,
