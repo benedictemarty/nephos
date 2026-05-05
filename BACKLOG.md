@@ -55,17 +55,17 @@ Réécriture du `schema_referentiel_v3.sql` en `schema_v4_skos.sql`. Voir ADR 00
 
 | ID | Titre | P | Taille | Dépend | État |
 |----|-------|---|--------|--------|------|
-| E2-01 | Schéma SKOS Core minimal (`scheme`, `concept`, `concept_label`, `concept_in_scheme`, `concept_semantic_relation`, `concept_note`) avec contraintes (`UNIQUE`, `CHECK`, FK). | **P0** | M | E1-01, E1-02 | 📋 |
-| E2-02 | Extension typage physique (`concept_physical`, lien à `unite` et `unite_conversion`). | P0 | S | E2-01 | 📋 |
-| E2-03 | Bloc gouvernance refondu (réutilise `users`, `roles`, `statuses`, `audit_log`, `proposals`, `imports`, `import_sources`) sur le modèle SKOS. | P0 | M | E2-01 | 📋 |
-| E2-04 | Trigger d'audit générique étendu à toutes les tables de l'étage SKOS. | P1 | S | E2-01, E2-03 | 📋 |
-| E2-05 | Vues métier — `v_concepts_actifs` (équivalent SKOS de `v_champs_actifs`), `v_proposals_pending`, `v_audit_recent`, `v_imports_status`. | P1 | S | E2-01, E2-03 | 📋 |
-| E2-06 | Vue de résolution hiérarchique récursive (`WITH RECURSIVE`) — descendants/ascendants d'un concept dans un scheme donné. | P1 | S | E2-01 | 📋 |
+| E2-01 | Schéma SKOS Core minimal (`scheme`, `concept`, `concept_label`, `concept_in_scheme`, `concept_semantic_relation`, `concept_note`) avec contraintes (`UNIQUE`, `CHECK`, FK). | **P0** | M | E1-01, E1-02 | ✅ |
+| E2-02 | Extension typage physique (`concept_physical`, lien à `unite` et `unite_conversion`). | P0 | S | E2-01 | ✅ |
+| E2-03 | Bloc gouvernance refondu (réutilise `users`, `roles`, `statuses`, `audit_log`, `proposals`, `imports`, `import_sources`) sur le modèle SKOS. | P0 | M | E2-01 | ✅ |
+| E2-04 | Trigger d'audit générique étendu à toutes les tables de l'étage SKOS (au-delà des 3 actuels : `scheme`, `concept`, `unite`). | P1 | S | E2-01, E2-03 | 📋 |
+| E2-05 | Vues métier — `v_concepts_actifs`, `v_concepts_mesurables`, `v_proposals_pending`, `v_audit_recent`, `v_imports_status`, `v_concepts_traduction_pending`. | P1 | S | E2-01, E2-03 | ✅ |
+| E2-06 | Vues récursives `v_concept_descendants` / `v_concept_ancestors` (`WITH RECURSIVE`, tolérantes aux cycles). | P1 | S | E2-01 | ✅ |
 | E2-07 | Tests d'intégrité du schéma (insertions valides/invalides, contraintes hiérarchiques, intégrité des mappings). `pytest-postgresql`. | P0 | M | E2-01, E3-04 | 📋 |
 | E2-08 | Migration alembic initiale capturant le schéma v4 (point de départ versionné). | P1 | S | E2-01, E3-09 | 📋 |
 | E2-09 | Diagramme entité-relation auto-généré (`schemaspy` ou `tbls`) commité dans `docs/schema/`. | P2 | XS | E2-01 | 📋 |
 | E2-10 | Glossaire des entités SKOS (1 page) — pour onboarding non-développeur. | P2 | XS | E2-01 | 📋 |
-| E2-11 | Décision sur la conservation ou non du `schema_referentiel_v3.sql` (archive vs suppression). | P1 | XS | E2-01 | 📋 |
+| E2-11 | Décision sur la conservation ou non du `schema_referentiel_v3.sql` (archive vs suppression). | P1 | XS | E2-01 | ✅ (avertissement ajouté en en-tête, conservé en référence) |
 
 ---
 

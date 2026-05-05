@@ -1,5 +1,22 @@
 -- ============================================================
--- BASE DE GESTION DE RÉFÉRENTIEL MÉTÉOROLOGIQUE — v3
+-- ⚠ DÉPRÉCIÉ — voir schema_v4_skos.sql
+--
+-- Ce schéma v3 est conservé pour référence et exploration.
+-- La v4 (schema_v4_skos.sql) le remplace en se fondant sur SKOS Core
+-- (W3C), conformément à l'ADR 0001. Les apports de la v4 :
+--   - Hiérarchie multi-parent à profondeur arbitraire (vs profondeur 2 figée).
+--   - Périmètre extensible à toutes les notions météo (phénomènes,
+--     indices, événements, processus…), pas seulement les variables
+--     atmosphériques classiques.
+--   - URI SKOS canoniques (https://w3id.org/nephos/...), ADR 0003.
+--   - Multilingue obligatoire FR+EN sur publié, ADR 0004.
+--   - Mappings cross-source (skos:exactMatch / closeMatch / *Match).
+--
+-- Ne pas baser de production sur cette version.
+-- ============================================================
+
+-- ============================================================
+-- BASE DE GESTION DE RÉFÉRENTIEL MÉTÉOROLOGIQUE — v3 (DÉPRÉCIÉ)
 -- ------------------------------------------------------------
 -- Architecture :
 --   gov.*     — gouvernance (users, rôles, workflow, audit, imports)

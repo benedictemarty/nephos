@@ -87,8 +87,8 @@ Le projet est en phase de **bootstrap** : décisions architecturales actées, co
 | Domaine | Statut |
 |---|---|
 | Décisions architecturales structurantes | 3 ADR acceptés sur ~9 prévus |
-| Schéma SQL v3 (héritage) | Présent dans `schema_referentiel_v3.sql`, sera refondu en v4 SKOS |
-| Schéma SQL v4 SKOS | À écrire (item `E2-01` du backlog) |
+| Schéma SQL v3 (héritage) | Présent dans `schema_referentiel_v3.sql`, **déprécié** — conservé pour référence |
+| Schéma SQL v4 SKOS | Présent dans `schema_v4_skos.sql` — modèle SKOS + typage physique + gouvernance |
 | Pipeline d'import Python | À écrire (EPIC E4 du backlog) |
 | API de consultation | À spécifier (ADR 0006 à rédiger) |
 
@@ -105,18 +105,20 @@ Voir le [BACKLOG.md](BACKLOG.md) pour la trajectoire détaillée.
 
 À mesure que le code applicatif arrive, les prérequis Python (3.12+, `uv`) seront ajoutés.
 
-### Appliquer le schéma actuel (v3, pour exploration)
-
-> ⚠️ Le schéma v3 sera **refondu** en SKOS au sprint de fondations. Ne pas baser de production sur cette version. Voir [ADR 0001](docs/adr/0001-adopter-skos-comme-socle-du-referentiel.md).
+### Appliquer le schéma v4 SKOS
 
 ```bash
 createdb nephos_dev
-psql -d nephos_dev -f schema_referentiel_v3.sql
+psql -d nephos_dev -f schema_v4_skos.sql
 ```
 
-Le script crée trois schémas (`gov`, `vocab`, `catalog`), des données seed (statuts, rôles, sources d'import, ~25 unités SI et d'usage, ~25 types de grandeur, ~25 champs météo) et quatre vues métier.
+Le script crée deux schémas (`gov`, `vocab`), pose les tables SKOS Core (`scheme`, `concept`, `concept_label`, `concept_in_scheme`, `concept_semantic_relation`, `concept_note`, `concept_mapping`), l'extension de typage physique (`concept_physical`, `unite`) et le bloc gouvernance (`users`, `roles`, `statuses`, `audit_log`, `proposals`, `imports`, `import_sources`). Triggers d'audit posés sur les tables principales. Données seed : statuts, rôles, deux utilisateurs (`system`, `admin`), 8 sources d'import.
 
-Voir l'en-tête commenté de `schema_referentiel_v3.sql` pour la lecture détaillée du schéma.
+Voir l'en-tête commenté de `schema_v4_skos.sql` pour la lecture détaillée.
+
+### Schéma v3 (déprécié)
+
+`schema_referentiel_v3.sql` est conservé pour référence et ne doit pas être appliqué en production. Voir l'avertissement en tête du fichier.
 
 ---
 
