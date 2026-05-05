@@ -34,6 +34,7 @@ from lxml import etree  # nosec B410 — parsing fait après validation par defu
 from nephos.config import get_settings
 from nephos.etl.base import Importer, ImportResult, SourceCode
 from nephos.etl.exceptions import ImportSourceError
+from nephos.importers._unit_symbols import normalize_cf_to_qudt
 from nephos.logging import get_logger
 
 logger = get_logger(__name__)
@@ -412,12 +413,19 @@ def _upsert_cf_mapping(
 def _resolve_unit(conn: psycopg.Connection, units_raw: str) -> int | None:
     """Retourne l'`unite_id` pour un symbole CF, ou None si non résolu.
 
-    Au démarrage, tentative de match strict sur `symbole` puis sur quelques
-    variantes courantes. À enrichir avec une vraie table de mapping
-    plus tard (cf. backlog).
+    Tentative dans l'ordre :
+      1. Symbole CF brut.
+      2. Symbole CF → notation QUDT (cf. `_unit_symbols.normalize_cf_to_qudt`).
+      3. Variante sans espaces.
+      4. Variante avec `/` à la place des espaces.
+
+    La normalisation CF → QUDT (étape 2) couvre les cas composés
+    (``m s-1``, ``kg m-2 s-1``…) et est responsable de la majeure
+    partie du gain de résolution observé après import QUDT.
     """
     candidates: Iterable[str] = (
         units_raw,
+        normalize_cf_to_qudt(units_raw),
         units_raw.replace(" ", ""),
         units_raw.replace(" ", "/"),
     )

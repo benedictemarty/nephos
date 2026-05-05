@@ -9,6 +9,25 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Export RDF/SKOS** (E6-01) — module `nephos.exporters.SKOSExporter` qui charge depuis Postgres et sérialise un sous-ensemble du référentiel.
+  - Formats supportés : Turtle (défaut), RDF/XML, JSON-LD, N3 (via `rdflib.Graph.serialize`).
+  - Triplets émis : `skos:Concept` + `skos:notation` + `skos:prefLabel`/`altLabel`/`hiddenLabel` multilingues + `skos:definition`/`scopeNote`/`example`/`historyNote`/`editorialNote`/`changeNote`. Schemes via `skos:ConceptScheme` + `skos:inScheme` + `skos:topConceptOf` + `skos:hasTopConcept`. Relations internes (`skos:broader`/`narrower`/`related`) entre concepts du sous-ensemble. Mappings externes (`*Match` vers ressources amont) toujours inclus. `dcterms:license <https://creativecommons.org/licenses/by/4.0/>` au niveau du scheme (ADR 0005). `dcterms:source <URL>` au niveau de chaque concept ayant un `import_source_id`.
+  - Filtrage par scheme via `scheme_code`. `statuses` configurable (`approved` + `published` par défaut).
+  - CLI : `nephos export turtle [SCHEME] [--output/-o FILE] [--format/-f turtle|xml|json-ld|n3]`. Sans `-o` : sortie sur stdout. Avec `-o` : table Rich récapitulative.
+  - 6 tests d'intégration (`tests/integration/test_exporter_skos.py`).
+  - **Validation live** : export du scheme `grandeurs-cf` complet (5023 concepts) en 2 secondes, 35154 lignes Turtle valide ; le payload est re-parsable par rdflib (round-trip OK). Critère ADR 0001 atteint (export validable par outil tiers — Skosmos / SKOS-Play à brancher en aval).
+
+- **Mapping symboles CF↔QUDT** (E4-04b) — `nephos.importers._unit_symbols.normalize_cf_to_qudt(s)` :
+  - Convertit la notation CF (tokens séparés par espaces, exposants signés sans `^`) vers la notation QUDT (numérateur·...· / dénominateur, exposants Unicode).
+  - Cas couverts : ``"m s-1"`` → ``"m/s"``, ``"kg m-2 s-1"`` → ``"kg/(m²·s)"``, ``"W m-2 K-1"`` → ``"W/(m²·K)"``, ``"m2 s-2"`` → ``"m²/s²"``, conservation des cas triviaux (``K``, ``Pa``, ``1``, ``%``, ``°C``).
+  - Tokens non-parsables : la chaîne d'entrée est rendue inchangée (`_resolve_unit` la traite comme une non-correspondance).
+  - Intégré dans `_resolve_unit` du CF importer comme deuxième candidat de match (entre le brut et les variantes texte simples).
+  - **Gain mesuré en live** sur l'import complet QUDT puis CF :
+    - Avant E4-04b : 560 / 5023 unités résolues (**11,2 %**).
+    - Après E4-04b : 4022 / 5023 unités résolues (**80,1 %**).
+    - +3462 résolutions, facteur ×7. Le millier restant correspond aux unités CF rares ou exotiques que QUDT ne couvre pas par symbole strict.
+  - 18 tests unitaires hors Postgres (`tests/test_unit_symbols.py`).
+
 - **`QUDTUnitsImporter`** (E4-04) — second import concret, alimente `vocab.unite` à grande échelle.
   - Parse le Turtle QUDT 2.1 via `rdflib` (URL officielle ou fichier local pour tests/dev).
   - Pour chaque ressource `?u a qudt:Unit` extrait : URI QUDT, `qudt:symbol`, `rdfs:label@en`, `dcterms:description`, `qudt:conversionMultiplier`, `qudt:conversionOffset`, `qudt:applicableSystem`, `qudt:hasQuantityKind` (multiples).

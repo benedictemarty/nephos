@@ -166,13 +166,55 @@ def db_upgrade() -> None:
 
 @export_app.command("turtle")
 def export_turtle(
-    scheme: Annotated[str, typer.Argument(help="Code du scheme à exporter.")],
+    scheme: Annotated[
+        str | None,
+        typer.Argument(help="Code du scheme à exporter (par défaut : tout)."),
+    ] = None,
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Fichier de sortie (sinon stdout)."),
+    ] = None,
+    fmt: Annotated[
+        str,
+        typer.Option(
+            "--format",
+            "-f",
+            help="Format RDF : turtle (défaut), xml (RDF/XML), json-ld, n3.",
+        ),
+    ] = "turtle",
 ) -> None:
-    """Exporte un scheme SKOS au format Turtle (.ttl)."""
-    console.print(
-        f"[yellow]Pas encore implémenté.[/yellow] "
-        f"Demande : export Turtle de '{scheme}'. Voir item E6-01 du backlog."
-    )
+    """Exporte un scheme SKOS (ou tout le référentiel) au format RDF demandé."""
+    from nephos.db import connect
+    from nephos.exporters import SKOSExporter
+
+    valid_formats = {"turtle", "xml", "json-ld", "n3"}
+    if fmt not in valid_formats:
+        console.print(f"[red]Format invalide : {fmt}.[/red] Choisir parmi {valid_formats}.")
+        raise typer.Exit(code=2)
+
+    exporter = SKOSExporter()
+    with connect() as conn:
+        result = exporter.export(conn, scheme_code=scheme, fmt=fmt)  # type: ignore[arg-type]
+
+    if output is not None:
+        output.write_text(result.payload, encoding="utf-8")
+        msg = f"Export écrit dans {output}"
+    else:
+        console.print(result.payload)
+        msg = "Export envoyé sur stdout"
+
+    if output is not None:
+        table = Table(title=f"Export SKOS ({result.format})")
+        table.add_column("Métrique", style="cyan")
+        table.add_column("Valeur", justify="right")
+        table.add_row("Schemes", str(result.nb_schemes))
+        table.add_row("Concepts", str(result.nb_concepts))
+        table.add_row("Labels", str(result.nb_labels))
+        table.add_row("Notes", str(result.nb_notes))
+        table.add_row("Relations internes", str(result.nb_relations))
+        table.add_row("Mappings externes", str(result.nb_mappings))
+        table.add_row("Sortie", msg)
+        console.print(table)
 
 
 # ----- validate (squelette) -----
