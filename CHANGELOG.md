@@ -9,6 +9,7 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Corrigé
 
+- **CI `Security` job** — `pip-audit` échouait sur `PYSEC-2022-42969` (CVE sur `py` 1.11.0, paquet EOL sans fix publié, tiré comme transitive sans impact réel sur notre code). Ajout d'un `--ignore-vuln PYSEC-2022-42969` documenté dans le workflow. À retirer si une version corrigée de `py` apparaît ou si on parvient à le faire sortir de l'arbre.
 - **`schema_v4_skos.sql`** — bug bloquant détecté lors de la première application réelle sur PostgreSQL 16. La contrainte `UNIQUE (source_concept_id, target_concept_id, relation, COALESCE(scheme_id, 0))` sur `vocab.concept_semantic_relation` est invalide en PostgreSQL (les expressions ne sont pas autorisées dans une contrainte UNIQUE inline). Remplacée par un `CREATE UNIQUE INDEX uq_csr_relation_scope` séparé, qui accepte les expressions. Bug attrapé par `docker compose up postgres` lors de l'installation des outils.
 - **`src/nephos/cli.py`** — `nephos --version` renvoyait exit code 2 (Typer considérait la sous-commande manquante malgré la callback). Ajout de `invoke_without_command=True` à l'application racine. Test `test_version_flag_prints_version` désormais vert.
 

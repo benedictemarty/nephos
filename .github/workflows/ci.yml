@@ -73,7 +73,13 @@ jobs:
       - name: Bandit
         run: uv run bandit -c pyproject.toml -r src/nephos
       - name: pip-audit (CVE des dépendances)
-        run: uv run pip-audit --ignore-vuln GHSA-NONE  # placeholder, à enrichir
+        # Ignores documentés :
+        # - PYSEC-2022-42969 : CVE sur le paquet `py` 1.11.0 (EOL, sans fix
+        #   publié), tiré comme transitive sans impact réel (le code
+        #   vulnérable n'est pas exécuté par notre pile). À retirer si une
+        #   version corrigée de `py` apparaît ou si on parvient à le faire
+        #   sortir de l'arbre de deps.
+        run: uv run pip-audit --ignore-vuln PYSEC-2022-42969
 
   # ------------------------------------------------------------------
   # Couverture de docstrings (informatif, n'échoue pas en dessous
