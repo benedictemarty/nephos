@@ -9,6 +9,10 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Trigger d'audit étendu** (E2-04) — `gov.audit_trigger_func` est désormais attaché à 10 tables au total (3 préexistantes : `scheme`, `concept`, `unite` ; 7 nouvelles : `concept_label`, `concept_note`, `concept_in_scheme`, `concept_semantic_relation`, `concept_mapping`, `concept_physical`, `gov.proposals`).
+  - Modifications dans `schema_v4_skos.sql` section 5 : 7 nouveaux `CREATE TRIGGER` avec PK explicite passée en `TG_ARGV[0]` (puisque les conventions de nommage ne suivent pas toujours `<table>_id` — ex. `concept_semantic_relation` a `relation_id`).
+  - `gov.proposals` : son champ `status` étant éligible à la distinction `STATUS_CHANGE` de la fonction d'audit, le passage `submitted → under_review/approved/rejected/applied` est tracé spécifiquement, ce qui rend `gov.v_audit_recent` utilisable comme journal des décisions de curation.
+  - 7 tests d'intégration (`tests/integration/test_schema_audit_extended.py`) couvrent INSERT, UPDATE avec `changed_columns`, DELETE et STATUS_CHANGE.
 - **Validation des exports par un outil tiers** (E6-03) — `nephos.validators.skos_external.SkosExternalValidator` réutilise `SKOSExporter` (E6-01) pour produire le graphe Turtle exact qui serait publié, puis exécute les checks SKOS standards via la bibliothèque **`skosify`** (NatLibFi, MIT).
   - Checks : `hierarchy_cycles` (cycles broader, SKOS S22/S27), `disjoint_relations` (broader/related disjoints, S27), `preflabel_uniqueness` (un prefLabel par lang, S14), `hierarchical_redundancy` (broader transitivement redondant), `label_overlap` (libellé partagé entre concepts distincts).
   - Capture programmatique des warnings skosify via un handler logging dédié (skosify logue sur le root logger). Classification par regex sur le message vers un code stable.
