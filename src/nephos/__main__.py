@@ -2,5 +2,11 @@
 
 from nephos.cli import app
 
-if __name__ == "__main__":  # pragma: no cover
+
+def main() -> None:
+    """Point d'entrée explicite (sortie typée pour mypy strict)."""
     app()
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

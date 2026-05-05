@@ -2,39 +2,47 @@
 
 from __future__ import annotations
 
+from typing import Annotated
+
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from nephos import __version__
 from nephos.config import get_settings
+from nephos.logging import configure_logging
 
-app = typer.Typer(
+app: typer.Typer = typer.Typer(
     name="nephos",
     help="Référentiel SKOS de métadonnées météorologiques.",
     no_args_is_help=True,
     add_completion=False,
 )
 
-import_app = typer.Typer(help="Imports depuis les sources standards (CF, QUDT, WMO, …).")
-db_app = typer.Typer(help="Gestion du schéma et des migrations PostgreSQL.")
-export_app = typer.Typer(help="Exports RDF/SKOS du référentiel.")
-validate_app = typer.Typer(help="Validation SHACL des concepts.")
+import_app: typer.Typer = typer.Typer(
+    help="Imports depuis les sources standards (CF, QUDT, WMO, …)."
+)
+db_app: typer.Typer = typer.Typer(help="Gestion du schéma et des migrations PostgreSQL.")
+export_app: typer.Typer = typer.Typer(help="Exports RDF/SKOS du référentiel.")
+validate_app: typer.Typer = typer.Typer(help="Validation SHACL des concepts.")
 
 app.add_typer(import_app, name="import")
 app.add_typer(db_app, name="db")
 app.add_typer(export_app, name="export")
 app.add_typer(validate_app, name="validate")
 
-console = Console()
+console: Console = Console()
 
 
 @app.callback()
 def _root(
-    version: bool = typer.Option(
-        False, "--version", "-V", help="Affiche la version et quitte."
-    ),
+    version: Annotated[
+        bool,
+        typer.Option("--version", "-V", help="Affiche la version et quitte."),
+    ] = False,
 ) -> None:
+    """Initialise le logging applicatif puis dispatch vers la sous-commande."""
+    configure_logging()
     if version:
         console.print(f"nephos {__version__}")
         raise typer.Exit
@@ -58,6 +66,7 @@ def info() -> None:
 
 # ----- import (squelette) -----
 
+
 @import_app.command("status")
 def import_status() -> None:
     """Affiche l'état de synchronisation de chaque source standard."""
@@ -71,6 +80,7 @@ def import_cf() -> None:
 
 
 # ----- db (squelette) -----
+
 
 @db_app.command("apply")
 def db_apply() -> None:
@@ -89,8 +99,11 @@ def db_upgrade() -> None:
 
 # ----- export (squelette) -----
 
+
 @export_app.command("turtle")
-def export_turtle(scheme: str = typer.Argument(..., help="Code du scheme à exporter.")) -> None:
+def export_turtle(
+    scheme: Annotated[str, typer.Argument(help="Code du scheme à exporter.")],
+) -> None:
     """Exporte un scheme SKOS au format Turtle (.ttl)."""
     console.print(
         f"[yellow]Pas encore implémenté.[/yellow] "
@@ -99,6 +112,7 @@ def export_turtle(scheme: str = typer.Argument(..., help="Code du scheme à expo
 
 
 # ----- validate (squelette) -----
+
 
 @validate_app.command("shacl")
 def validate_shacl() -> None:

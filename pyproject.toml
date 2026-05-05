@@ -122,13 +122,22 @@ ignore = [
 quote-style = "double"
 indent-style = "space"
 
-# ----- Mypy (typage strict) -----
+# ----- Mypy (typage strict ++) -----
 [tool.mypy]
 python_version = "3.12"
 strict = true
+# Renforcements en plus de strict :
 warn_unused_ignores = true
 warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
 no_implicit_reexport = true
+disallow_any_explicit = false  # toléré pour LogRecord.__dict__ items
+disallow_any_generics = true
+disallow_untyped_decorators = true
+implicit_reexport = false
+strict_equality = true
+extra_checks = true
 files = ["src/nephos"]
 
 [[tool.mypy.overrides]]
