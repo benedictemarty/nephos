@@ -16,6 +16,7 @@ from nephos.importers import (
     WMO_PRESETS,
     CFAreaTypeImporter,
     CFStandardNamesImporter,
+    ECMWFMappingsImporter,
     QUDTUnitsImporter,
     WMOCodesImporter,
 )
@@ -172,6 +173,25 @@ def import_qudt_units(
         src = Path(source) if Path(source).exists() else source
     importer = QUDTUnitsImporter(source=src)
     _run_and_print(importer, dry_run, "QUDT Units")
+
+
+@import_app.command("ecmwf-mappings")
+def import_ecmwf_mappings(
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="N'écrit rien en base.")] = False,
+    source: Annotated[
+        str | None,
+        typer.Option(
+            "--source",
+            help="URL ou chemin local vers cfName.def. Par défaut : ecmwf/eccodes develop.",
+        ),
+    ] = None,
+) -> None:
+    """Pose des `closeMatch` CF Standard Names → ECMWF Parameter Database (E4-06)."""
+    src: str | Path | None = None
+    if source is not None:
+        src = Path(source) if Path(source).exists() else source
+    importer = ECMWFMappingsImporter(source=src)
+    _run_and_print(importer, dry_run, "ECMWF Parameter mappings")
 
 
 @import_app.command("wmo-codes")

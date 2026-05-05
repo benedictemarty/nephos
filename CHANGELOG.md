@@ -9,6 +9,13 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Mappings ECMWF Parameter Database** (E4-06) — alignement par mapping seul, pas de clone des paramètres ECMWF.
+  - Source : `cfName.def` du dépôt `ecmwf/eccodes` (Apache 2.0), qui expose un mapping CF Standard Name → triplet GRIB2 (`discipline`, `parameterCategory`, `parameterNumber`).
+  - `nephos.importers.ecmwf_mappings.ECMWFMappingsImporter` parse le fichier (regex sur les blocs `'name' = { … }`), pour chaque CF name présent en base sous `grandeurs-cf` pose un `concept_mapping mapping_relation='closeMatch'` vers `https://codes.ecmwf.int/grib/param-db/?discipline=D&parameterCategory=C&parameterNumber=N`. `discover_version` = MD5 court du fichier. Idempotent grâce à la contrainte unique `(concept_id, target_uri, mapping_relation)`.
+  - CLI : `nephos import ecmwf-mappings [--source URL|FILE] [--dry-run]`.
+  - 7 tests : 3 intégration (création + idempotence + base sans CF) et 4 unitaires de parsing (entry simple, qualifiers extra, entry incomplète skipée, format URL).
+  - Validation live : 47 entrées parsées depuis ecCodes develop. Sur une base sans CF importé : `0 créations, 47 unmatched` (comportement attendu). Sur base CF complète, le mapping s'établit pour les CF couverts par `cfName.def`.
+  - `closeMatch` (et non `exactMatch`) : un même triplet GRIB2 peut désigner plusieurs paramètres ECMWF distincts en présence de qualificatifs additionnels (`typeOfStatisticalProcessing`, `typeOfFirstFixedSurface`) ; la V2 affinera vers un `id` ECMWF unique.
 - **Détection des concepts disparus côté source** (E4-08) — règle « jamais de DELETE, toujours `status='deprecated'` ».
   - Nouveau module `nephos.etl.deprecation` avec `mark_disappeared_concepts(conn, source_id, current_version, scheme_codes)` qui passe en `deprecated` les concepts dont `import_version` ne correspond plus à la version courante, restreints à `scheme_codes`. Sécurité : `scheme_codes` vide ⇒ no-op (refus de marquer toute la base).
   - Nouvel hook `Importer.target_scheme_codes() -> tuple[str, ...] | None` (default `None` = désactivé). Déclaré par `CFStandardNamesImporter` (`grandeurs-cf`), `CFAreaTypeImporter` (`area-types-cf`), `WMOCodesImporter` (scheme courant). `QUDTUnitsImporter` reste opt-out (touche `vocab.unite`).

@@ -1,0 +1,32 @@
+# Mini fixture cfName.def pour tests E4-06 — extrait de ecmwf/eccodes (Apache 2.0).
+#Temperature
+'air_temperature' = {
+	 discipline = 0 ;
+	 parameterCategory = 0 ;
+	 parameterNumber = 0 ;
+	}
+#U component of wind
+'eastward_wind' = {
+	 discipline = 0 ;
+	 parameterCategory = 2 ;
+	 parameterNumber = 2 ;
+	}
+#V component of wind
+'northward_wind' = {
+	 discipline = 0 ;
+	 parameterCategory = 2 ;
+	 parameterNumber = 3 ;
+	}
+#Surface pressure
+'surface_air_pressure' = {
+	 discipline = 0 ;
+	 parameterCategory = 3 ;
+	 parameterNumber = 0 ;
+	 typeOfFirstFixedSurface = 1 ;
+	}
+#Inexistant in Nephos test base — should not match
+'unknown_cf_name_for_testing' = {
+	 discipline = 99 ;
+	 parameterCategory = 99 ;
+	 parameterNumber = 99 ;
+	}
