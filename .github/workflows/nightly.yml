@@ -1,0 +1,75 @@
+# Nightly Nephos — outils lents (mutation testing, audit profond)
+# Déclencheurs : cron quotidien à 03:00 UTC, manuel.
+
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.5.4"
+
+permissions:
+  contents: read
+
+jobs:
+  # ------------------------------------------------------------------
+  # Mutation testing : exécution longue, n'échoue pas la CI quotidienne.
+  # ------------------------------------------------------------------
+  mutmut:
+    name: Mutation testing (mutmut)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nephos
+          POSTGRES_PASSWORD: nephos
+          POSTGRES_DB: nephos_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NEPHOS_DATABASE_URL: postgresql://nephos:nephos@localhost:5432/nephos_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - run: uv sync --all-extras
+      - run: psql "$NEPHOS_DATABASE_URL" -f schema_v4_skos.sql
+      - name: Run mutation testing
+        run: uv run mutmut run || true
+      - name: Mutmut results
+        run: uv run mutmut results
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutmut-results
+          path: .mutmut-cache
+
+  # ------------------------------------------------------------------
+  # Audit approfondi des dépendances (CVE + dead code).
+  # ------------------------------------------------------------------
+  audit-deep:
+    name: Audit approfondi (pip-audit + vulture)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - run: uv sync --all-extras
+      - name: pip-audit (mode strict)
+        run: uv run pip-audit --strict
+      - name: Vulture (dead code)
+        run: uv run vulture src/nephos

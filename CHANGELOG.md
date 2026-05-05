@@ -9,6 +9,10 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **CI GitHub Actions** :
+  - `.github/workflows/ci.yml` — pipeline déclenché sur push `main`, pull-request et manuel. 6 jobs : `lint` (pre-commit complet), `type-check` (mypy strict), `security` (bandit + pip-audit), `docs-coverage` (interrogate, informatif), `test` (pytest avec matrice PostgreSQL 14 et 16, schéma v4 appliqué, couverture XML uploadée), `build` (sdist + wheel via uv build, gated sur les autres jobs). Concurrence par branche avec annulation des runs précédents.
+  - `.github/workflows/nightly.yml` — exécuté à 03:00 UTC ou manuel. 2 jobs `continue-on-error` : `mutmut` (mutation testing avec Postgres réel, artefacts uploadés) et `audit-deep` (`pip-audit --strict` + `vulture`).
+  - Couvre l'item `E3-07` du backlog.
 - **Outillage qualité, sécurité et tests étendu** :
   - `.pre-commit-config.yaml` complet : hooks hygiène (EOF, trailing whitespace, large files, JSON/YAML/TOML/symlinks/case conflict, detect-private-key), `gitleaks` (détection de secrets), `ruff` (lint + format), `mypy` (typage strict), `bandit` (analyse de sécurité statique), `deptry` (dépendances inutilisées ou manquantes), `validate-pyproject`, `yamllint`, `markdownlint-cli`, `sqlfluff` (final newline sur le schéma SQL).
   - `pyproject.toml` enrichi en dev-deps : `hypothesis` (property-based testing), `mutmut` (mutation testing), `bandit[toml]`, `pip-audit` (CVE des dépendances), `deptry`, `interrogate` (couverture docstrings, seuil 70 %), `vulture` (dead code), `validate-pyproject[all]`.

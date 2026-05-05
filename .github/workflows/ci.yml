@@ -1,0 +1,156 @@
+# CI Nephos — lint, type, sécu, tests, build
+# Déclencheurs : push sur main, pull requests, manuel.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  UV_VERSION: "0.5.4"
+
+permissions:
+  contents: read
+
+jobs:
+  # ------------------------------------------------------------------
+  # Lint, format, validate-pyproject — ultra-rapide, fail fast.
+  # ------------------------------------------------------------------
+  lint:
+    name: Lint, format, hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - name: Install dev deps
+        run: uv sync --all-extras
+      - name: Pre-commit (lint, format, hygiene, secrets, validate-pyproject, deptry, yaml/md/sql)
+        run: uv run pre-commit run --all-files --show-diff-on-failure
+
+  # ------------------------------------------------------------------
+  # Typage strict mypy (en plus du run pre-commit, pour être sûr).
+  # ------------------------------------------------------------------
+  type-check:
+    name: Type-check (mypy strict)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - name: Install dev deps
+        run: uv sync --all-extras
+      - name: Mypy
+        run: uv run mypy src/nephos
+
+  # ------------------------------------------------------------------
+  # Sécurité statique : bandit + pip-audit (CVE des deps).
+  # ------------------------------------------------------------------
+  security:
+    name: Security (bandit, pip-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - name: Install dev deps
+        run: uv sync --all-extras
+      - name: Bandit
+        run: uv run bandit -c pyproject.toml -r src/nephos
+      - name: pip-audit (CVE des dépendances)
+        run: uv run pip-audit --ignore-vuln GHSA-NONE  # placeholder, à enrichir
+
+  # ------------------------------------------------------------------
+  # Couverture de docstrings (informatif, n'échoue pas en dessous
+  # du seuil tant que le projet est en bootstrap).
+  # ------------------------------------------------------------------
+  docs-coverage:
+    name: Docstring coverage (interrogate)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - run: uv sync --all-extras
+      - run: uv run interrogate -v src/nephos
+
+  # ------------------------------------------------------------------
+  # Tests unitaires + intégration avec PostgreSQL réel.
+  # ------------------------------------------------------------------
+  test:
+    name: Tests (pytest, Postgres ${{ matrix.postgres }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ["14", "16"]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_USER: nephos
+          POSTGRES_PASSWORD: nephos
+          POSTGRES_DB: nephos_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NEPHOS_DATABASE_URL: postgresql://nephos:nephos@localhost:5432/nephos_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - name: Install dev deps
+        run: uv sync --all-extras
+      - name: Apply schema v4
+        run: psql "$NEPHOS_DATABASE_URL" -f schema_v4_skos.sql
+      - name: Pytest with coverage
+        run: uv run pytest --cov=nephos --cov-report=xml --cov-report=term
+      - name: Upload coverage artifact
+        if: matrix.postgres == '16'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+  # ------------------------------------------------------------------
+  # Build : sdist + wheel.
+  # ------------------------------------------------------------------
+  build:
+    name: Build sdist + wheel
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, security, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
