@@ -412,5 +412,56 @@ def validate_shacl(
         console.print(result.raw_report)
 
 
+@validate_app.command("quality")
+def validate_quality(
+    scheme: Annotated[
+        str | None,
+        typer.Option("--scheme", help="Limite le rapport à un scheme (code)."),
+    ] = None,
+    show_samples: Annotated[
+        bool,
+        typer.Option("--samples/--no-samples", help="Affiche les URI exemples par catégorie."),
+    ] = True,
+    fail_on_error: Annotated[
+        bool,
+        typer.Option(
+            "--fail-on-error",
+            help="Sortie code 2 s'il existe au moins une anomalie de sévérité 'error'.",
+        ),
+    ] = False,
+) -> None:
+    """Rapport de qualité du référentiel (E5-04) — anomalies structurelles."""
+    from nephos.db import connect
+    from nephos.validators import QualityReporter
+
+    reporter = QualityReporter(scheme_code=scheme)
+    with connect() as conn:
+        report = reporter.run(conn)
+
+    title = "Rapport qualité Nephos"
+    if scheme:
+        title += f" (scheme={scheme})"
+    table = Table(title=title)
+    table.add_column("Catégorie", style="cyan")
+    table.add_column("Sévérité", style="dim")
+    table.add_column("Compteur", justify="right")
+    if show_samples:
+        table.add_column("Exemples")
+
+    severity_style = {"error": "red", "warning": "yellow", "info": "dim"}
+    for finding in report.findings:
+        sev = f"[{severity_style.get(finding.severity, 'white')}]{finding.severity}[/]"
+        cells = [finding.label, sev, str(finding.count)]
+        if show_samples:
+            cells.append(", ".join(finding.samples) if finding.samples else "—")
+        table.add_row(*cells)
+
+    console.print(table)
+    console.print(f"\nTotal anomalies : [bold]{report.total_anomalies}[/bold]")
+
+    if fail_on_error and report.has_errors:
+        raise typer.Exit(code=2)
+
+
 if __name__ == "__main__":  # pragma: no cover
     app()

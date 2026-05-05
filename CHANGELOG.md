@@ -9,6 +9,12 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Rapport qualité automatisé** (E5-04) — `nephos.validators.quality_report.QualityReporter` scanne la base à la recherche d'anomalies structurelles complémentaires au validateur SHACL Core.
+  - 8 détecteurs : `concepts_without_pref_label` (error), `concepts_without_scheme` (warning), `concepts_self_broader` (error), `duplicate_pref_label_lang` (error), `duplicate_notation_in_scheme` (error), `duplicate_mappings` (error, mêmes `(concept, target_uri)` avec relations divergentes), `missing_pref_label_fr` et `missing_pref_label_en` (warning sur concepts publiés, ADR 0004).
+  - Sortie structurée : `QualityReport` agrège une liste de `QualityFinding` (code stable, label humain, severity ∈ error/warning/info, count, samples ≤ 5 URIs). Propriétés `has_errors` et `total_anomalies`.
+  - Filtrage par scheme (`scheme_code`) sur les détecteurs applicables ; `concepts_without_scheme` ignore le filtre par construction (un concept orphelin n'a aucun scheme à filtrer).
+  - CLI : `nephos validate quality [--scheme CODE] [--samples/--no-samples] [--fail-on-error]`. Sortie Rich avec sévérités colorées et exemples par catégorie. Code de sortie 2 si `--fail-on-error` et au moins une anomalie de sévérité `error` est détectée — exploitable en CI.
+  - 11 tests d'intégration : 1 par détecteur (incluant les cas où la DB bloque déjà l'anomalie en défense en profondeur), 1 sur le filtrage par scheme, 2 sur la structure du rapport.
 - **Mappings ECMWF Parameter Database** (E4-06) — alignement par mapping seul, pas de clone des paramètres ECMWF.
   - Source : `cfName.def` du dépôt `ecmwf/eccodes` (Apache 2.0), qui expose un mapping CF Standard Name → triplet GRIB2 (`discipline`, `parameterCategory`, `parameterNumber`).
   - `nephos.importers.ecmwf_mappings.ECMWFMappingsImporter` parse le fichier (regex sur les blocs `'name' = { … }`), pour chaque CF name présent en base sous `grandeurs-cf` pose un `concept_mapping mapping_relation='closeMatch'` vers `https://codes.ecmwf.int/grib/param-db/?discipline=D&parameterCategory=C&parameterNumber=N`. `discover_version` = MD5 court du fichier. Idempotent grâce à la contrainte unique `(concept_id, target_uri, mapping_relation)`.
