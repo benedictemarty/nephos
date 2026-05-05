@@ -1,0 +1,25 @@
+# Évite d'envoyer des fichiers inutiles dans le contexte de build.
+.git/
+.github/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.mutmut-cache
+htmlcov/
+.coverage
+coverage.xml
+.env
+.env.local
+.idea/
+.vscode/
+docs/
+tests/
+*.md
+!README.md
+!alembic/README.md
+schema_referentiel_v3.sql

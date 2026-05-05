@@ -9,6 +9,13 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **`Dockerfile`** multi-stage (E3-08) :
+  - Builder `python:3.12-slim-bookworm` avec `build-essential` + `uv` pinné en version, `uv sync --frozen --no-dev` pour la couche dépendances reproductible.
+  - Runtime `python:3.12-slim-bookworm` minimal : `libpq5` (psycopg), `libxml2` + `libxslt1.1` (lxml pour CF), `ca-certificates` (HTTPS sources amont). Utilisateur non-root `nephos` créé avec `groupadd`/`useradd --system`. Le venv et le code source sont copiés depuis le builder. `ENTRYPOINT ["nephos"]`, `CMD ["--help"]`. `NEPHOS_LOG_FORMAT=json` par défaut en runtime conteneurisé.
+  - `.dockerignore` complet (exclut `.git`, caches, `.venv`, `tests/`, `docs/`, `.env`, schéma v3 déprécié, etc.).
+- **`docker-compose.yml`** (E3-10) :
+  - Service `postgres` (image `postgres:16-alpine`) avec volume nommé `nephos-pg-data`, healthcheck `pg_isready`, schéma v4 monté en `docker-entrypoint-initdb.d` (appliqué automatiquement à la création du volume).
+  - Service `nephos` (build du Dockerfile local) en profil `cli` — n'est pas lancé par `compose up` par défaut, mais via `compose run --rm nephos <commande>`.
 - **Tests d'intégrité du schéma v4** :
   - `tests/conftest.py` — fixtures `db_conn` (recrée le schéma avant chaque test via le DROP/CREATE en tête de `schema_v4_skos.sql`, skip propre si `NEPHOS_DATABASE_URL` non défini) et `admin_user_id`. Connexion `psycopg` autocommit.
   - `tests/integration/test_schema_constraints.py` — 23 tests sur les contraintes : URI `^https?://`, `notation` `^[a-z0-9][a-z0-9_-]*$`, prefLabel unique par `(concept, lang)`, BCP 47 sur `lang`, `valid_to > valid_from`, `source_concept ≠ target_concept`, `range_min ≤ range_max`, FK obligatoire sur `concept_mapping.target_source_id`, `value_type` dans l'enum.

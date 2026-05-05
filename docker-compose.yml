@@ -1,0 +1,49 @@
+# docker-compose dev pour Nephos
+# Usage :
+#   docker compose up -d            # démarre Postgres
+#   docker compose run --rm nephos  # lance le CLI dans un conteneur jetable
+#   docker compose down             # arrête tout (préserve le volume PG)
+#   docker compose down -v          # arrête tout ET détruit le volume PG
+
+name: nephos
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nephos-postgres
+    environment:
+      POSTGRES_USER: nephos
+      POSTGRES_PASSWORD: nephos
+      POSTGRES_DB: nephos_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./schema_v4_skos.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nephos -d nephos_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  nephos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nephos:dev
+    container_name: nephos-cli
+    environment:
+      NEPHOS_DATABASE_URL: postgresql://nephos:nephos@postgres:5432/nephos_dev
+      NEPHOS_LOG_FORMAT: text
+      NEPHOS_LOG_LEVEL: INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      # Ne démarre pas en `up` par défaut. À invoquer via `compose run`.
+      - cli
+
+volumes:
+  pg_data:
+    name: nephos-pg-data
