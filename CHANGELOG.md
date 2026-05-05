@@ -9,6 +9,7 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Validation SHACL post-import** (E5-03) — `RunOptions.validate_after` (défaut `True`) chaîne `SHACLValidator.validate` après le `load`. Compteurs ajoutés en `notes` du `ImportResult`. Mode `strict_validation=True` lève `ImportValidationError` et déclenche le rollback de la transaction de chargement en cas de violation. 4 tests d'intégration : conforme + notes informatives, désactivation lax, violation en lax (consigne), violation en strict (rollback + journal failed).
 - **Export RDF/SKOS** (E6-01) — module `nephos.exporters.SKOSExporter` qui charge depuis Postgres et sérialise un sous-ensemble du référentiel.
   - Formats supportés : Turtle (défaut), RDF/XML, JSON-LD, N3 (via `rdflib.Graph.serialize`).
   - Triplets émis : `skos:Concept` + `skos:notation` + `skos:prefLabel`/`altLabel`/`hiddenLabel` multilingues + `skos:definition`/`scopeNote`/`example`/`historyNote`/`editorialNote`/`changeNote`. Schemes via `skos:ConceptScheme` + `skos:inScheme` + `skos:topConceptOf` + `skos:hasTopConcept`. Relations internes (`skos:broader`/`narrower`/`related`) entre concepts du sous-ensemble. Mappings externes (`*Match` vers ressources amont) toujours inclus. `dcterms:license <https://creativecommons.org/licenses/by/4.0/>` au niveau du scheme (ADR 0005). `dcterms:source <URL>` au niveau de chaque concept ayant un `import_source_id`.
@@ -16,6 +17,14 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
   - CLI : `nephos export turtle [SCHEME] [--output/-o FILE] [--format/-f turtle|xml|json-ld|n3]`. Sans `-o` : sortie sur stdout. Avec `-o` : table Rich récapitulative.
   - 6 tests d'intégration (`tests/integration/test_exporter_skos.py`).
   - **Validation live** : export du scheme `grandeurs-cf` complet (5023 concepts) en 2 secondes, 35154 lignes Turtle valide ; le payload est re-parsable par rdflib (round-trip OK). Critère ADR 0001 atteint (export validable par outil tiers — Skosmos / SKOS-Play à brancher en aval).
+- **Validation SHACL des concepts** (E5-01) — premier validateur sémantique Nephos.
+  - `shapes/nephos_skos_core.ttl` — 5 shapes SHACL : URI Nephos (ADR 0003), notation regex (ADR 0003), prefLabel ≥ 1 + `uniqueLang` (SKOS S14), `PublishedConcept` virtuel imposant FR+EN (ADR 0004), pas de self-broader (SKOS S27).
+  - `nephos.validators.shacl_runner.SHACLValidator` — charge les concepts publiés/approuvés depuis Postgres comme graphe RDF (concept, notation, prefLabel multilingue, broader internes), applique pyshacl avec les shapes Core et retourne un `SHACLValidationReport` structuré (conforms, concepts validés, violations/warnings/infos, rapport texte complet).
+  - Mode `treat_as_published=True` (option CLI `--strict`) : force tous les concepts à être validés contre la shape `PublishedConcept`. Sert à identifier la **file d'attente de traduction FR** sur les imports automatiques.
+  - Filtrage par scheme (`--scheme CODE`) pour cibler une partie du référentiel.
+  - CLI : `nephos validate shacl [--scheme CODE] [--strict] [--report]`. Sortie Rich avec compteurs ; option `--report` affiche le rapport pyshacl complet en cas de non-conformité.
+  - 5 tests d'intégration : concept conforme, concept sans prefLabel viole, mode strict impose FR+EN, filtre scheme isole le sous-graphe, base vide reste conforme.
+  - **Validation live** sur le pipeline complet (QUDT puis CF) : 5023 concepts CF conformes en mode normal (URI valides, notations conformes, prefLabel@en présents, pas de self-broader). En mode `--strict`, 5023 violations attendues — la file de traduction FR est identifiée par construction.
 
 - **Mapping symboles CF↔QUDT** (E4-04b) — `nephos.importers._unit_symbols.normalize_cf_to_qudt(s)` :
   - Convertit la notation CF (tokens séparés par espaces, exposants signés sans `^`) vers la notation QUDT (numérateur·...· / dénominateur, exposants Unicode).

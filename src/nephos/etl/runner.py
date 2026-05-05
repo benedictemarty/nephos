@@ -16,10 +16,14 @@ Pilote le cycle de vie d'un `Importer` :
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from nephos.db import connect
+
+if TYPE_CHECKING:
+    import psycopg
 from nephos.etl.base import Importer, ImportResult
-from nephos.etl.exceptions import ImportError, ImportSourceError
+from nephos.etl.exceptions import ImportError, ImportSourceError, ImportValidationError
 from nephos.etl.journal import close_run, open_run
 from nephos.logging import get_logger
 
@@ -38,6 +42,16 @@ class RunOptions:
 
     dry_run: bool = False
     """Si vrai, n'écrit rien en base — affiche les compteurs estimés."""
+
+    validate_after: bool = True
+    """Exécute une validation SHACL Nephos Core après le `load`. Le résultat
+    est ajouté en `notes` du `ImportResult`. Item E5-03 du backlog."""
+
+    strict_validation: bool = False
+    """Si vrai et `validate_after=True`, une violation SHACL bloque l'import :
+    rollback de la transaction de chargement et `ImportValidationError`
+    levée. Sinon, les violations sont consignées en notes mais n'arrêtent
+    pas le pipeline."""
 
 
 class ImportRunner:
@@ -96,8 +110,18 @@ class ImportRunner:
                     raw = self.importer.extract()
                     entries = self.importer.transform(raw)
                     result = self.importer.load(conn, entries, version)
+                    if opts.validate_after:
+                        result = self._run_validation(conn, result, strict=opts.strict_validation)
                     close_run(conn, entry, result)
                     conn.commit()
+                except ImportValidationError as exc:
+                    conn.rollback()
+                    logger.exception(
+                        "Validation SHACL post-import en échec, rollback effectué",
+                        extra={"source": source_code, "import_id": entry.import_id},
+                    )
+                    self._record_failure(entry.import_id, str(exc))
+                    raise
                 except Exception as exc:
                     conn.rollback()
                     logger.exception(
@@ -137,6 +161,34 @@ class ImportRunner:
             nb_entites=len(entries),
             notes="dry-run — aucune écriture",
         )
+
+    def _run_validation(
+        self,
+        conn: psycopg.Connection,
+        result: ImportResult,
+        *,
+        strict: bool,
+    ) -> ImportResult:
+        """Exécute la validation SHACL Nephos Core sur le résultat d'import.
+
+        Imports tardifs (à l'intérieur de la fonction) pour éviter la
+        dépendance circulaire `etl ↔ validators` au chargement du module.
+        """
+        from nephos.validators import SHACLValidator
+
+        validator = SHACLValidator()
+        report = validator.validate(conn)
+        suffix = (
+            f"SHACL : {report.violations} violation(s), "
+            f"{report.warnings} warning(s) sur {report.concepts_validated} concept(s)"
+        )
+        result.notes = (result.notes + " | " + suffix) if result.notes else suffix
+        if not report.conforms and strict:
+            raise ImportValidationError(
+                f"Validation SHACL en échec après import "
+                f"({report.violations} violation(s)). Rollback du chargement."
+            )
+        return result
 
     def _record_failure(self, import_id: int, message: str) -> None:
         """Persiste l'échec dans gov.imports via une connexion autocommit
