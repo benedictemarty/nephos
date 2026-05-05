@@ -12,7 +12,7 @@ from rich.table import Table
 from nephos import __version__
 from nephos.config import get_settings
 from nephos.etl.runner import ImportRunner, RunOptions
-from nephos.importers import CFStandardNamesImporter, QUDTUnitsImporter
+from nephos.importers import CFAreaTypeImporter, CFStandardNamesImporter, QUDTUnitsImporter
 from nephos.logging import configure_logging
 
 app: typer.Typer = typer.Typer(
@@ -128,6 +128,25 @@ def import_cf(
         src = Path(source) if Path(source).exists() else source
     importer = CFStandardNamesImporter(source=src)
     _run_and_print(importer, dry_run, "CF Standard Names")
+
+
+@import_app.command("cf-area")
+def import_cf_area(
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="N'écrit rien en base.")] = False,
+    source: Annotated[
+        str | None,
+        typer.Option(
+            "--source",
+            help="URL ou chemin local vers le fichier XML CF Area Type. Par défaut : URL officielle.",
+        ),
+    ] = None,
+) -> None:
+    """Importe les CF Area Type depuis cfconventions.org."""
+    src: str | Path | None = None
+    if source is not None:
+        src = Path(source) if Path(source).exists() else source
+    importer = CFAreaTypeImporter(source=src)
+    _run_and_print(importer, dry_run, "CF Area Type Table")
 
 
 @import_app.command("qudt-units")
