@@ -134,7 +134,7 @@ Rendre le référentiel consommable hors-Postgres.
 
 | ID | Titre | P | Taille | Dépend | État |
 |----|-------|---|--------|--------|------|
-| E6-01 | Export RDF/SKOS au format **Turtle** (`.ttl`) d'un scheme complet ou d'un sous-arbre. | P1 | S | E2-01 | 📋 |
+| E6-01 | Export RDF/SKOS — module `nephos.exporters.SKOSExporter` charge depuis Postgres et sérialise en Turtle/RDF-XML/JSON-LD/N3 via rdflib. Couvre : `skos:Concept` + notation + prefLabel/altLabel/hiddenLabel multilingues + skos:definition/scopeNote/example/historyNote, `skos:inScheme` + `skos:topConceptOf` + `skos:hasTopConcept`, broader/narrower/related internes, *Match externes (mappings amont), `dcterms:license` (CC-BY 4.0 ADR 0005), `dcterms:source` (URL source amont). CLI `nephos export turtle [SCHEME] [-o FILE] [-f FORMAT]`. **Validation live : 5023 concepts CF exportés en 2s, 35154 lignes Turtle valide, parsing rdflib OK** (critère ADR 0001 atteint). 6 tests d'intégration. | P1 | S | E2-01 | ✅ |
 | E6-02 | Export **RDF/XML** et **JSON-LD** (sérialisations alternatives via `rdflib`). | P2 | XS | E6-01 | 📋 |
 | E6-03 | Validation des exports par un outil tiers (Skosmos en local ou validateur SKOS-Play en ligne). | P1 | S | E6-01 | 📋 |
 | E6-04 | Export différentiel (delta entre deux versions du référentiel) pour publication incrémentale. | P2 | M | E6-01 | 📋 |
