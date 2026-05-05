@@ -14,6 +14,14 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté (suite)
 
+- **Framework ETL `nephos.etl`** (E4-01) — orchestration générique des imports depuis les sources standards.
+  - `nephos.etl.base` : `Importer` (ABC avec `discover_version`, `extract`, `transform`, `load`), `ImportResult` (dataclass slots avec compteurs), `SourceCode` (NewType pour traçabilité du code amont).
+  - `nephos.etl.runner` : `ImportRunner` orchestrateur transactionnel (extract → transform → load dans une même transaction ; rollback complet en cas d'exception ; trace `failed` dans `gov.imports` persistée hors-transaction). Mode `dry_run` (extract+transform sans écrire).
+  - `nephos.etl.journal` : `open_run`, `close_run`, `mark_failed`, `resolve_source`. Gère les trois statuts (`success`/`partial`/`failed`/`aborted`) prévus par le schéma v4.
+  - `nephos.etl.exceptions` : `ImportError`, `ImportSourceError`, `ImportValidationError`.
+  - `nephos.db` : helper `connect(autocommit=False)` centralisé pour psycopg.
+  - 5 tests d'intégration : création de concepts + journal `success`, idempotence (re-run skip), échec → rollback complet + journal `failed`, dry-run sans écriture, source non déclarée → `ImportError`.
+  - CLI `nephos import cf` accepte désormais `--dry-run` (squelette en attente de l'`Importer` concret CF, item E4-02).
 - **ADR 0011 — Protection technique de la branche `main`** (`docs/adr/0011-protection-technique-branche-main.md`). Acte le passage de la chaîne de revue de CONTRIBUTING.md d'une politique contractuelle à un **enforcement technique** via les Branch Protection Rules GitHub (PR obligatoire, ≥1 review humaine, status checks verts, linear history, no admin bypass, no force push, no deletion). Commande `gh api` complète versionnée dans l'ADR. Procédure de rollback documentée. Couvre l'item `E1-11` (passe à ✅ une fois la commande exécutée).
 - **ADR 0012 — Gestion de la vulnérabilité PYSEC-2022-42969** (`docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md`). Acte l'ignore explicite et exclusif de cette CVE (paquet `py` 1.11.0 EOL, sans fix publié, transitive sans impact réel sur la pile). Justification, conditions de sortie (`CS1` fix amont, `CS2` retrait de l'arbre, `CS3` chemin d'exécution réel découvert), procédure de réévaluation annuelle. Item `E9-05` créé dans le backlog pour la remédiation à long terme.
 
