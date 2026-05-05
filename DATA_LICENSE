@@ -1,0 +1,87 @@
+Nephos — Data License
+======================
+
+Le projet Nephos applique deux licences distinctes selon la nature de l'œuvre.
+Cette décision est actée dans l'ADR 0005 (`docs/adr/0005-licences-apache-2-et-cc-by-4.md`).
+
+1. CODE
+-------
+
+Le code source — Python, schémas SQL, scripts, workflows GitHub Actions,
+configurations applicatives, tests — est distribué sous **Apache License 2.0**.
+Voir le fichier `LICENSE` à la racine du dépôt.
+
+2. DOCUMENTATION DU PROJET
+--------------------------
+
+La documentation interne d'ingénierie (`README.md`, `CHANGELOG.md`,
+`BACKLOG.md`, `CLAUDE.md`, ADR dans `docs/adr/`) est également distribuée
+sous **Apache License 2.0**.
+
+3. DONNÉES ORIGINALES NEPHOS
+----------------------------
+
+Les données originales produites dans le cadre de Nephos sont distribuées
+sous **Creative Commons Attribution 4.0 International (CC-BY 4.0)**.
+
+  https://creativecommons.org/licenses/by/4.0/
+
+Sont concernés notamment :
+
+  - Les concepts créés localement (notation, prefLabel, altLabel, hiddenLabel,
+    definition, scopeNote, example rédigés en interne).
+  - Les concept schemes propres au projet.
+  - Les mappings éditoriaux entre sources amont (skos:exactMatch,
+    skos:closeMatch, skos:broadMatch, skos:narrowMatch, skos:relatedMatch
+    entre concepts Nephos et concepts externes).
+  - Les traductions françaises.
+  - Les seeds de données livrés avec le schéma SQL et destinés à devenir
+    des concepts du référentiel.
+
+L'utilisateur des données doit citer Nephos en attribution. Une formulation
+acceptable :
+
+  « Données issues du référentiel Nephos
+    (https://w3id.org/nephos), licence CC-BY 4.0. »
+
+4. DONNÉES IMPORTÉES DEPUIS LES SOURCES STANDARDS
+-------------------------------------------------
+
+Nephos importe et redistribue des données issues de référentiels externes.
+Ces données conservent la licence d'origine de leur source. L'attribution
+amont est préservée par construction via la table `concept_mapping` et
+les triplets `dcterms:source` ajoutés aux exports RDF.
+
+Sources principales et licences applicables :
+
+  - CF Standard Names (cfconventions.org) ............. CC-BY 4.0
+  - QUDT — Quantities, Units, Dimensions and Types .... CC-BY 4.0
+  - NERC Vocabulary Server (BODC) ..................... CC-BY 4.0
+  - WMO Codes Registry ................................ Resolution 40 (cas par cas)
+  - ECMWF Parameter Database .......................... À vérifier au cas par cas
+
+Les données issues de la WMO sous régime restrictif de la Resolution 40
+ne sont pas redistribuées sous CC-BY 4.0 ; le pipeline d'import les
+identifie et les exclut du clonage local. Leur usage se limite alors à
+l'alignement par mapping (référence externe sans copie locale).
+
+5. ATTRIBUTION DANS LES EXPORTS
+-------------------------------
+
+Tout export RDF/SKOS d'un concept scheme Nephos inclut un triplet de la
+forme :
+
+  <https://w3id.org/nephos/vocab/{scheme}>
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> .
+
+Les concepts importés conservent un triplet `dcterms:source` pointant
+vers leur source amont, ce qui permet à un consommateur de remonter à la
+licence d'origine de chaque concept.
+
+6. RÉFÉRENCES
+-------------
+
+  - Apache License 2.0    https://www.apache.org/licenses/LICENSE-2.0
+  - CC-BY 4.0             https://creativecommons.org/licenses/by/4.0/
+  - WMO Resolution 40     https://library.wmo.int
+  - ADR 0005 (décision)   docs/adr/0005-licences-apache-2-et-cc-by-4.md

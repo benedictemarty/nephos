@@ -135,9 +135,9 @@ Voir [CLAUDE.md](CLAUDE.md) pour la lecture détaillée du schéma.
 |----|-------|--------|
 | [0001](docs/adr/0001-adopter-skos-comme-socle-du-referentiel.md) | Adopter SKOS comme socle du référentiel de métadonnées météo | Accepté |
 | [0002](docs/adr/0002-python-comme-stack-dimplementation.md) | Python comme stack d'implémentation du pipeline sémantique | Accepté |
-| 0003 | Domaine d'URI stable (engagement irréversible) | À rédiger |
-| 0004 | Stratégie multilingue (FR seul vs FR+EN) | À rédiger |
-| 0005 | Licence des données importées et de publication | À rédiger |
+| [0003](docs/adr/0003-domaine-uri-w3id-org.md) | Domaine d'URI : `w3id.org/nephos` | Accepté |
+| [0004](docs/adr/0004-strategie-multilingue-fr-en.md) | Stratégie multilingue FR + EN obligatoires sur les concepts publiés | Accepté |
+| [0005](docs/adr/0005-licences-apache-2-et-cc-by-4.md) | Licences : Apache 2.0 (code) + CC-BY 4.0 (données originales) | Accepté |
 | 0006 | Choix de la façade API (REST custom / GraphQL / auto-génération) | À rédiger |
 | 0007 | Outil de curation (Directus / VocBench / app custom) | À rédiger |
 | 0008 | Conteneurisation et déploiement | À rédiger |
@@ -167,7 +167,15 @@ Le projet est mené en **méthode agile**. Chaque modification est tracée :
 
 ## Licence
 
-À définir — voir [ADR 0005](BACKLOG.md#epic-1--gouvernance-architecturale-et-documentaire) (à rédiger) qui actera la licence du référentiel et la compatibilité avec les licences des sources amont (CF en CC-BY, QUDT en CC-BY, WMO sous Resolution 40).
+Double licence — voir [ADR 0005](docs/adr/0005-licences-apache-2-et-cc-by-4.md) :
+
+- **Code** (Python à venir, schémas SQL, scripts, workflows, doc d'ingénierie) : [**Apache 2.0**](LICENSE).
+- **Données originales** (concepts maison, mappings éditoriaux, traductions) : [**CC-BY 4.0**](DATA_LICENSE).
+- **Données importées** des sources standards : licence d'origine préservée, attribution maintenue dans les exports RDF (`dcterms:source`).
+
+Pour utiliser les données du référentiel, citer Nephos :
+
+> Données issues du référentiel Nephos (https://w3id.org/nephos), licence CC-BY 4.0.
 
 ---
 

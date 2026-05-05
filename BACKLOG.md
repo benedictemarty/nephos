@@ -36,9 +36,10 @@ Décisions structurantes à acter avant d'écrire du code en quantité.
 
 | ID | Titre | P | Taille | Dépend | État |
 |----|-------|---|--------|--------|------|
-| E1-01 | ADR 0003 — Domaine d'URI stable (`https://nephos.meteo.fr/...` ou autre). Décision irréversible une fois publication faite. | **P0** | S | — | 📋 |
-| E1-02 | ADR 0004 — Stratégie multilingue (FR seul vs FR+EN dès le démarrage). Impacte le schéma de `concept_label` et la stratégie d'import. | P0 | XS | — | 📋 |
-| E1-03 | ADR 0005 — Licence des données importées et licence de publication du référentiel (CF CC-BY, QUDT CC-BY, WMO Resolution 40 — compatibilité à vérifier). | P0 | S | — | 📋 |
+| E1-01 | ADR 0003 — Domaine d'URI stable. Décision : `https://w3id.org/nephos/vocab/{scheme}/{notation}`. | **P0** | S | — | ✅ |
+| E1-02 | ADR 0004 — Stratégie multilingue. Décision : `prefLabel@fr` ET `prefLabel@en` obligatoires sur les concepts publiés. | P0 | XS | — | ✅ |
+| E1-03 | ADR 0005 — Licences. Décision : Apache 2.0 (code) + CC-BY 4.0 (données originales) + sources amont sous licence d'origine. | P0 | S | — | ✅ |
+| E1-10 | Réservation du préfixe `nephos` sur `perma-id/w3id.org` (PR + `.htaccess` initial pointant sur placeholder). | P1 | S | E1-01 | 📋 |
 | E1-04 | ADR 0006 — Choix de la façade API (REST custom FastAPI / GraphQL via Hasura ou pg_graphql / auto-génération PostgREST). Différé en ADR 0002. | P1 | M | E2-01 | 📋 |
 | E1-05 | ADR 0007 — Outil de curation (Directus / VocBench / app custom React/TS). | P2 | M | E2-* | 📋 |
 | E1-06 | ADR 0008 — Stratégie de conteneurisation et déploiement (Compose dev / Kubernetes prod / autre). | P2 | M | E3-08 | 📋 |
