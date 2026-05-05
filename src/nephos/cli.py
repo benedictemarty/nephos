@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -10,6 +11,8 @@ from rich.table import Table
 
 from nephos import __version__
 from nephos.config import get_settings
+from nephos.etl.runner import ImportRunner, RunOptions
+from nephos.importers import CFStandardNamesImporter
 from nephos.logging import configure_logging
 
 app: typer.Typer = typer.Typer(
@@ -82,19 +85,32 @@ def import_status() -> None:
 @import_app.command("cf")
 def import_cf(
     dry_run: Annotated[bool, typer.Option("--dry-run", help="N'écrit rien en base.")] = False,
+    source: Annotated[
+        str | None,
+        typer.Option(
+            "--source",
+            help="URL ou chemin local vers le fichier XML CF. Par défaut : URL officielle.",
+        ),
+    ] = None,
 ) -> None:
-    """Importe les CF Standard Names depuis cfconventions.org.
+    """Importe les CF Standard Names depuis cfconventions.org."""
+    src: str | Path | None = None
+    if source is not None:
+        src = Path(source) if Path(source).exists() else source
+    importer = CFStandardNamesImporter(source=src)
+    result = ImportRunner(importer).run(RunOptions(dry_run=dry_run))
 
-    Implémentation complète : item E4-02 du backlog. Le framework ETL
-    (`nephos.etl`, item E4-01) est en place — il manque l'`Importer`
-    concret CF.
-    """
-    _ = dry_run
-    console.print(
-        "[yellow]Pas encore implémenté.[/yellow] "
-        "Le framework ETL est livré (E4-01 ✅). L'Importer CF concret "
-        "viendra avec l'item E4-02."
-    )
+    table = Table(title=f"Import CF Standard Names — version {result.version}")
+    table.add_column("Métrique", style="cyan")
+    table.add_column("Valeur", justify="right")
+    table.add_row("Entrées vues", str(result.nb_entites))
+    table.add_row("Créations", str(result.nb_creations))
+    table.add_row("Modifications", str(result.nb_modifications))
+    table.add_row("Inchangées", str(result.nb_skipped))
+    table.add_row("Overrides protégés", str(result.nb_overrides_protected))
+    if result.notes:
+        table.add_row("Notes", result.notes)
+    console.print(table)
 
 
 # ----- db (squelette) -----
