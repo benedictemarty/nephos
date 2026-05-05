@@ -38,6 +38,8 @@ L'agent reviewer **n'a aucun droit de merge**. Sa fonction est d'éclairer la re
 
 ### Niveau 3 — Validation humaine senior
 
+> **Cas du projet à mainteneur unique** : tant que Nephos n'a qu'un seul compte mainteneur GitHub, la règle « ≥ 1 review humaine indépendante approuvée » est **techniquement inopposable** (GitHub interdit l'auto-approbation). [ADR 0014](docs/adr/0014-adapter-protection-pour-mainteneur-unique.md) acte la dégradation : le compteur de reviews passe à `0` jusqu'à ce qu'un second mainteneur entre. Tous les autres verrous (7 status checks verts, linear history, no force push, no deletion, no admin bypass, conversation resolution) restent en place. La compensation de la « deuxième paire d'yeux » repose sur l'agent reviewer ([ADR 0013](docs/adr/0013-agent-reviewer-claude-code-action.md)), les status checks CI, et l'auto-discipline du mainteneur (lecture du diff complet avant chaque merge). Quand un second mainteneur arrive, on revient à `1` review humaine obligatoire.
+
 Un mainteneur senior **examine matériellement** :
 
 - la PR elle-même (diff complet, pas seulement le résumé) ;

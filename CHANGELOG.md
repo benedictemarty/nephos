@@ -7,6 +7,11 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ## [Non publié]
 
+### Ajouté
+
+- **ADR 0014 — Adapter la chaîne de revue au cas du mainteneur unique** (`docs/adr/0014-adapter-protection-pour-mainteneur-unique.md`). **Supersède partiellement ADR 0011** sur le seul paramètre `required_pull_request_reviews.required_approving_review_count` (passage de `1` à `0`). Tous les autres verrous d'ADR 0011 sont préservés (PR obligatoire, 7 status checks requis, linear history, no force push, no deletion, no admin bypass, conversation resolution). Documente les conditions de retour automatique à `1` (CR1 second mainteneur ajouté, CR2 organisation multi-membres). Compense partiellement la dégradation par les autres niveaux de la chaîne (CI verte obligatoire, agent reviewer ADR 0013, auto-discipline du mainteneur). Items `E1-13` (cet amendement) et `E1-14` (procédure de retour) ajoutés au backlog.
+- **Mention spécifique** dans `CONTRIBUTING.md` du cas mainteneur unique, pointant vers ADR 0014.
+
 ### Ajouté (suite)
 
 - **ADR 0011 — Protection technique de la branche `main`** (`docs/adr/0011-protection-technique-branche-main.md`). Acte le passage de la chaîne de revue de CONTRIBUTING.md d'une politique contractuelle à un **enforcement technique** via les Branch Protection Rules GitHub (PR obligatoire, ≥1 review humaine, status checks verts, linear history, no admin bypass, no force push, no deletion). Commande `gh api` complète versionnée dans l'ADR. Procédure de rollback documentée. Couvre l'item `E1-11` (passe à ✅ une fois la commande exécutée).
@@ -122,3 +127,4 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 | [0010](docs/adr/0010-nephos-comme-moteur-de-validation.md) | Étendre le périmètre aux outils de validation (GRIB, NetCDF, BUFR…) | Accepté |
 | [0011](docs/adr/0011-protection-technique-branche-main.md) | Protection technique de la branche `main` (Branch Protection Rules) | Accepté |
 | [0012](docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md) | Gestion de la vulnérabilité PYSEC-2022-42969 (paquet `py` EOL) | Accepté |
+| [0014](docs/adr/0014-adapter-protection-pour-mainteneur-unique.md) | Adapter la chaîne de revue au cas du mainteneur unique (supersède partiellement 0011) | Accepté |
