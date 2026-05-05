@@ -197,7 +197,7 @@ class ImportRunner:
         try:
             with connect(autocommit=True) as conn, conn.cursor() as cur:
                 cur.execute(
-                    "UPDATE gov.imports SET status = 'failed', notes = %s " "WHERE import_id = %s",
+                    "UPDATE gov.imports SET status = 'failed', notes = %s WHERE import_id = %s",
                     (message[:8000], import_id),
                 )
         except Exception:

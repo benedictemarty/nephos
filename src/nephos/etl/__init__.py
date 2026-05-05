@@ -23,11 +23,11 @@ from nephos.etl.exceptions import (
 from nephos.etl.runner import ImportRunner
 
 __all__ = [
-    "Importer",
     "ImportError",
     "ImportResult",
     "ImportRunner",
     "ImportSourceError",
     "ImportValidationError",
+    "Importer",
     "SourceCode",
 ]

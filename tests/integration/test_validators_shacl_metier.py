@@ -54,8 +54,7 @@ def _add_pref_label(conn: psycopg.Connection, cid: int, lang: str, value: str) -
 def _create_scheme(conn: psycopg.Connection, code: str, uri: str) -> int:
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO vocab.scheme (uri, code, title) "
-            "VALUES (%s, %s, %s) RETURNING scheme_id",
+            "INSERT INTO vocab.scheme (uri, code, title) VALUES (%s, %s, %s) RETURNING scheme_id",
             (uri, code, f"Test {code}"),
         )
         row = cur.fetchone()
@@ -66,7 +65,7 @@ def _create_scheme(conn: psycopg.Connection, code: str, uri: str) -> int:
 def _add_in_scheme(conn: psycopg.Connection, cid: int, sid: int) -> None:
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO vocab.concept_in_scheme (concept_id, scheme_id) " "VALUES (%s, %s)",
+            "INSERT INTO vocab.concept_in_scheme (concept_id, scheme_id) VALUES (%s, %s)",
             (cid, sid),
         )
 
@@ -80,8 +79,7 @@ class TestNephosMetierShapes:
         # concept_physical scalar SANS unité → NumericMeasurableShape Warning.
         with db_conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO vocab.concept_physical (concept_id, value_type) "
-                "VALUES (%s, 'scalar')",
+                "INSERT INTO vocab.concept_physical (concept_id, value_type) VALUES (%s, 'scalar')",
                 (cid,),
             )
 

@@ -40,7 +40,7 @@ from nephos.logging import get_logger
 logger = get_logger(__name__)
 
 CF_DEFAULT_URL = (
-    "https://cfconventions.org/Data/cf-standard-names/current/src/" "cf-standard-name-table.xml"
+    "https://cfconventions.org/Data/cf-standard-names/current/src/cf-standard-name-table.xml"
 )
 CF_SCHEME_CODE = "grandeurs-cf"
 CF_SCHEME_TITLE = "CF Standard Names — grandeurs physiques"
