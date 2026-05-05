@@ -12,7 +12,13 @@ from rich.table import Table
 from nephos import __version__
 from nephos.config import get_settings
 from nephos.etl.runner import ImportRunner, RunOptions
-from nephos.importers import CFAreaTypeImporter, CFStandardNamesImporter, QUDTUnitsImporter
+from nephos.importers import (
+    WMO_PRESETS,
+    CFAreaTypeImporter,
+    CFStandardNamesImporter,
+    QUDTUnitsImporter,
+    WMOCodesImporter,
+)
 from nephos.logging import configure_logging
 
 app: typer.Typer = typer.Typer(
@@ -166,6 +172,79 @@ def import_qudt_units(
         src = Path(source) if Path(source).exists() else source
     importer = QUDTUnitsImporter(source=src)
     _run_and_print(importer, dry_run, "QUDT Units")
+
+
+@import_app.command("wmo-codes")
+def import_wmo_codes(
+    code_list: Annotated[
+        str | None,
+        typer.Option(
+            "--code-list",
+            help=(
+                "Clé d'une code list WMO préconfigurée (ex. 'bufr-0-02-001'). "
+                "Mutuellement exclusif avec --register-url."
+            ),
+        ),
+    ] = None,
+    register_url: Annotated[
+        str | None,
+        typer.Option(
+            "--register-url",
+            help="URL Turtle d'un register WMO custom (mode avancé).",
+        ),
+    ] = None,
+    scheme_code: Annotated[
+        str | None,
+        typer.Option("--scheme-code", help="Code Nephos cible (avec --register-url)."),
+    ] = None,
+    scheme_title: Annotated[
+        str | None,
+        typer.Option("--scheme-title", help="Titre humain du scheme (avec --register-url)."),
+    ] = None,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="N'écrit rien en base.")] = False,
+    list_presets: Annotated[
+        bool,
+        typer.Option("--list-presets", help="Affiche les presets WMO disponibles et quitte."),
+    ] = False,
+) -> None:
+    """Importe une code list WMO depuis le WMO Codes Registry (E4-05)."""
+    if list_presets:
+        table = Table(title="Presets WMO disponibles")
+        table.add_column("Clé", style="cyan", no_wrap=True)
+        table.add_column("Scheme Nephos")
+        table.add_column("Register URL", style="dim")
+        for key, preset in sorted(WMO_PRESETS.items()):
+            table.add_row(key, preset.scheme_code, preset.register_url)
+        console.print(table)
+        return
+
+    if code_list is not None and register_url is not None:
+        console.print("[red]--code-list et --register-url sont mutuellement exclusifs.[/red]")
+        raise typer.Exit(code=2)
+
+    if code_list is not None:
+        try:
+            importer = WMOCodesImporter.from_preset(code_list)
+        except ValueError as exc:
+            console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=2) from exc
+        title = f"WMO Codes — {code_list}"
+    elif register_url is not None:
+        if not scheme_code or not scheme_title:
+            console.print("[red]--register-url exige --scheme-code et --scheme-title.[/red]")
+            raise typer.Exit(code=2)
+        importer = WMOCodesImporter(
+            register_url=register_url, scheme_code=scheme_code, scheme_title=scheme_title
+        )
+        title = f"WMO Codes — {scheme_code}"
+    else:
+        console.print(
+            "[red]Préciser --code-list <preset> ou --register-url <url> "
+            "(voir --list-presets).[/red]"
+        )
+        raise typer.Exit(code=2)
+
+    _run_and_print(importer, dry_run, title)
 
 
 def _run_and_print(importer: object, dry_run: bool, title: str) -> None:

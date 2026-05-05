@@ -9,6 +9,15 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Import WMO Codes Registry** (E4-05) — `nephos.importers.wmo_codes.WMOCodesImporter`, importer paramétrable pour les code lists publiées en SKOS/Turtle par https://codes.wmo.int.
+  - Constructeur : `WMOCodesImporter(register_url=..., scheme_code=..., scheme_title=...)`. Helper `from_preset(key)` pour les presets fournis.
+  - 4 presets initiaux (BUFR section commune) : `bufr-0-02-001` (Type of station), `bufr-0-02-002` (Type of instrumentation for wind measurement), `bufr-0-02-003` (Type of measuring equipment used), `bufr-0-08-021` (Time significance).
+  - Parsing : `rdflib` Turtle, identification du `reg:Register` racine, extraction des `skos:Concept` membres directs (filtre par préfixe d'URI). `discover_version` = `dct:modified` du register.
+  - Side effects en base : création locale du scheme cible (`status='approved'`), upsert des concepts par URI Nephos `{uri_base}/{scheme_code}/{notation}` (idempotent), `concept_label@en` (kind=pref) depuis `rdfs:label@en`, `concept_in_scheme`, `concept_mapping exactMatch` vers l'URI WMO d'origine, `import_source_id = WMO_CODES`.
+  - CLI : `nephos import wmo-codes --code-list <preset>` (presets) ou `--register-url <URL> --scheme-code <code> --scheme-title <titre>` (mode custom). `--list-presets` affiche le tableau Rich des presets disponibles.
+  - 5 tests d'intégration (`tests/integration/test_importer_wmo_codes.py`) avec fixture mini Turtle (`tests/integration/fixtures/wmo_bufr_0_02_001_mini.ttl`).
+  - **Validation live** sur BUFR 0-08-021 (Time significance) : 31 concepts importés, idempotence ✅ (rerun = 31 inchangées), 0 violation et 0 warning SHACL post-import (`v_imports_status` montre WMO_CODES = 1 version, 31 concepts).
+  - Limitation actuelle : `dcterms:source` au niveau scheme/concept reste à enrichir (n'altère pas les triplets `exactMatch` vers les URIs WMO d'origine, qui constituent déjà la traçabilité sémantique).
 - **Validation SHACL post-import** (E5-03) — `RunOptions.validate_after` (défaut `True`) chaîne `SHACLValidator.validate` après le `load`. Compteurs ajoutés en `notes` du `ImportResult`. Mode `strict_validation=True` lève `ImportValidationError` et déclenche le rollback de la transaction de chargement en cas de violation. 4 tests d'intégration : conforme + notes informatives, désactivation lax, violation en lax (consigne), violation en strict (rollback + journal failed).
 - **Export RDF/SKOS** (E6-01) — module `nephos.exporters.SKOSExporter` qui charge depuis Postgres et sérialise un sous-ensemble du référentiel.
   - Formats supportés : Turtle (défaut), RDF/XML, JSON-LD, N3 (via `rdflib.Graph.serialize`).

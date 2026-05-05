@@ -79,7 +79,7 @@ class _ViolatingImporter(_ConformingImporter):
     ) -> ImportResult:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO vocab.concept (uri, notation, status) " "VALUES (%s, %s, 'approved')",
+                "INSERT INTO vocab.concept (uri, notation, status) VALUES (%s, %s, 'approved')",
                 ("https://example.org/wrong-namespace/foo", "foo"),
             )
         return ImportResult(
