@@ -12,7 +12,7 @@ from rich.table import Table
 from nephos import __version__
 from nephos.config import get_settings
 from nephos.etl.runner import ImportRunner, RunOptions
-from nephos.importers import CFStandardNamesImporter
+from nephos.importers import CFStandardNamesImporter, QUDTUnitsImporter
 from nephos.logging import configure_logging
 
 app: typer.Typer = typer.Typer(
@@ -98,9 +98,39 @@ def import_cf(
     if source is not None:
         src = Path(source) if Path(source).exists() else source
     importer = CFStandardNamesImporter(source=src)
-    result = ImportRunner(importer).run(RunOptions(dry_run=dry_run))
+    _run_and_print(importer, dry_run, "CF Standard Names")
 
-    table = Table(title=f"Import CF Standard Names — version {result.version}")
+
+@import_app.command("qudt-units")
+def import_qudt_units(
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="N'écrit rien en base.")] = False,
+    source: Annotated[
+        str | None,
+        typer.Option(
+            "--source",
+            help="URL ou chemin local vers le Turtle QUDT. Par défaut : URL officielle.",
+        ),
+    ] = None,
+) -> None:
+    """Importe les unités QUDT depuis qudt.org."""
+    src: str | Path | None = None
+    if source is not None:
+        src = Path(source) if Path(source).exists() else source
+    importer = QUDTUnitsImporter(source=src)
+    _run_and_print(importer, dry_run, "QUDT Units")
+
+
+def _run_and_print(importer: object, dry_run: bool, title: str) -> None:
+    """Exécute l'import et affiche un rapport Rich uniforme.
+
+    Le typage de `importer` reste `object` ici pour éviter une dépendance
+    rigide sur l'ABC `Importer` (le runner accepte tout `Importer`).
+    """
+    from nephos.etl.base import Importer as _ImporterABC
+
+    assert isinstance(importer, _ImporterABC)
+    result = ImportRunner(importer).run(RunOptions(dry_run=dry_run))
+    table = Table(title=f"Import {title} — version {result.version}")
     table.add_column("Métrique", style="cyan")
     table.add_column("Valeur", justify="right")
     table.add_row("Entrées vues", str(result.nb_entites))

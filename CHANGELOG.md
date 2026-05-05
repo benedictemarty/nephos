@@ -9,6 +9,16 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **`QUDTUnitsImporter`** (E4-04) — second import concret, alimente `vocab.unite` à grande échelle.
+  - Parse le Turtle QUDT 2.1 via `rdflib` (URL officielle ou fichier local pour tests/dev).
+  - Pour chaque ressource `?u a qudt:Unit` extrait : URI QUDT, `qudt:symbol`, `rdfs:label@en`, `dcterms:description`, `qudt:conversionMultiplier`, `qudt:conversionOffset`, `qudt:applicableSystem`, `qudt:hasQuantityKind` (multiples).
+  - Détection SI canonique : `applicableSystem sou:SI` + `multiplier ∈ {1, NULL}` + `offset ∈ {0, NULL}`. Le degré Celsius (offset 273.15) reste donc non-canonique malgré son appartenance à SI.
+  - Idempotence par `qudt_uri` (UPDATE en place) ; rapprochement par `symbole` pour enrichir une unité préexistante (cas seed). Collisions de symbole skip + warning.
+  - Respect de `has_local_override` (compte en `nb_overrides_protected`).
+  - **Validation live** : 2490 unités QUDT importées en 11s. Après QUDT, le re-import CF résout 560 unités (vs 17 avant) — gain de 543 résolutions par symbole strict. Le reste relève du mapping symboles CF↔QUDT (item E4-04b à venir : CF écrit `m s-1`, QUDT écrit `m/s`).
+  - 7 tests d'intégration sur fixture Turtle mini (`qudt_units_mini.ttl`, 4 unités) : création + champs renseignés, idempotence avec UPDATE en place, dry-run, rapprochement par symbole sur unité existante, override local protégé, transform pur (extract + parsing).
+  - CLI : `nephos import qudt-units [--dry-run] [--source PATH_OR_URL]`.
+
 - **`CFStandardNamesImporter`** (E4-02) — premier import concret consommant le framework E4-01.
   - Parse l'XML CF Standard Names (URL officielle par défaut, fichier local en fallback pour tests/dev).
   - Normalise les notations CF en minuscules pour respecter ADR 0003 (URI Nephos `^[a-z0-9][a-z0-9_-]*$`). L'identifiant CF original (qui peut contenir des majuscules pour les isotopes : `13C`, `18O`) est conservé dans `concept_physical.cf_standard_name`. Les `prefLabel@en` humanisés (underscores → espaces) gardent la casse originale pour préserver la sémantique scientifique.

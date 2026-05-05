@@ -8,5 +8,6 @@ Chaque sous-module spécialise la classe `Importer` du framework ETL
 """
 
 from nephos.importers.cf import CFStandardNamesImporter
+from nephos.importers.qudt_units import QUDTUnitsImporter
 
-__all__ = ["CFStandardNamesImporter"]
+__all__ = ["CFStandardNamesImporter", "QUDTUnitsImporter"]
