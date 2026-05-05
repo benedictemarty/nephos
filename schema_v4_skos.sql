@@ -391,6 +391,38 @@ CREATE TRIGGER trg_audit_unite
   AFTER INSERT OR UPDATE OR DELETE ON vocab.unite
   FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('unite_id');
 
+-- E2-04 : trigger d'audit étendu à toutes les tables sémantiques de vocab.
+-- Permet de tracer label/note/scheme membership/relations/mappings/typage physique
+-- via un seul mécanisme unifié, exploitable par `gov.v_audit_recent`.
+
+CREATE TRIGGER trg_audit_concept_label
+  AFTER INSERT OR UPDATE OR DELETE ON vocab.concept_label
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('concept_label_id');
+
+CREATE TRIGGER trg_audit_concept_note
+  AFTER INSERT OR UPDATE OR DELETE ON vocab.concept_note
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('concept_note_id');
+
+CREATE TRIGGER trg_audit_concept_in_scheme
+  AFTER INSERT OR UPDATE OR DELETE ON vocab.concept_in_scheme
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('concept_in_scheme_id');
+
+CREATE TRIGGER trg_audit_concept_semantic_relation
+  AFTER INSERT OR UPDATE OR DELETE ON vocab.concept_semantic_relation
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('relation_id');
+
+CREATE TRIGGER trg_audit_concept_mapping
+  AFTER INSERT OR UPDATE OR DELETE ON vocab.concept_mapping
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('mapping_id');
+
+CREATE TRIGGER trg_audit_concept_physical
+  AFTER INSERT OR UPDATE OR DELETE ON vocab.concept_physical
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('concept_id');
+
+CREATE TRIGGER trg_audit_proposals
+  AFTER INSERT OR UPDATE OR DELETE ON gov.proposals
+  FOR EACH ROW EXECUTE FUNCTION gov.audit_trigger_func('proposal_id');
+
 
 -- ============================================================
 -- 6. DONNÉES DE RÉFÉRENCE
