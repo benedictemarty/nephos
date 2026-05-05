@@ -27,6 +27,11 @@ class ImportResult:
     nb_modifications: int = 0
     nb_skipped: int = 0
     nb_overrides_protected: int = 0
+    nb_deprecated_disappeared: int = 0
+    """Concepts marqués `deprecated` parce qu'absents de la nouvelle
+    version source (E4-08). Toujours `0` quand l'importer ne supporte
+    pas la détection (cf. `Importer.target_scheme_codes`)."""
+
     notes: str | None = None
     extra: dict[str, str] = field(default_factory=dict)
 
@@ -84,6 +89,24 @@ class Importer(ABC):
         minimum porter une clé ``uri`` qui identifie le concept côté
         Nephos.
         """
+
+    def target_scheme_codes(self) -> tuple[str, ...] | None:
+        """Liste des codes de schemes que cet importer alimente.
+
+        Sert à la détection automatique des concepts disparus côté
+        source (E4-08) : après le ``load``, le runner passe en
+        ``status='deprecated'`` les concepts encore en base sous ces
+        schemes mais qui n'ont **pas** été touchés à la version
+        importée (i.e. ``import_version`` resté à une ancienne valeur,
+        et ``has_local_override = FALSE``).
+
+        Retourne ``None`` (défaut) pour désactiver la détection — le
+        cas par défaut sécuritaire pour les sources qui n'alimentent
+        pas ``vocab.concept`` (par ex. ``QUDTUnitsImporter`` qui touche
+        ``vocab.unite``) ou pour les imports partiels où on ne peut
+        pas raisonner sur l'exhaustivité.
+        """
+        return None
 
     @abstractmethod
     def load(

@@ -135,6 +135,10 @@ class WMOCodesImporter(Importer):
             scheme_title=preset.scheme_title,
         )
 
+    def target_scheme_codes(self) -> tuple[str, ...]:
+        """Détection des disparus limitée au scheme cible courant (E4-08)."""
+        return (self._scheme_code,)
+
     def discover_version(self) -> str:
         """Retourne ``dct:modified`` du register WMO (ou ``"unknown"`` si absent)."""
         graph = self._fetch()

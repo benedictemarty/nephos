@@ -85,6 +85,10 @@ class CFStandardNamesImporter(Importer):
     # Étapes du framework ETL
     # ------------------------------------------------------------------
 
+    def target_scheme_codes(self) -> tuple[str, ...]:
+        """Détection des disparus active sur le scheme `grandeurs-cf` (E4-08)."""
+        return (CF_SCHEME_CODE,)
+
     def discover_version(self) -> str:
         root = self._fetch()
         version = root.findtext("version_number")
