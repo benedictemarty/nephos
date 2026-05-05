@@ -116,7 +116,7 @@ psql -d nephos_dev -f schema_referentiel_v3.sql
 
 Le script crée trois schémas (`gov`, `vocab`, `catalog`), des données seed (statuts, rôles, sources d'import, ~25 unités SI et d'usage, ~25 types de grandeur, ~25 champs météo) et quatre vues métier.
 
-Voir [CLAUDE.md](CLAUDE.md) pour la lecture détaillée du schéma.
+Voir l'en-tête commenté de `schema_referentiel_v3.sql` pour la lecture détaillée du schéma.
 
 ---
 
@@ -126,7 +126,6 @@ Voir [CLAUDE.md](CLAUDE.md) pour la lecture détaillée du schéma.
 |---|---|
 | [BACKLOG.md](BACKLOG.md) | Backlog projet en 9 EPICs, priorités, sprints candidats |
 | [CHANGELOG.md](CHANGELOG.md) | Journal des modifications (Keep a Changelog 1.1.0) |
-| [CLAUDE.md](CLAUDE.md) | Guide d'architecture pour Claude Code (lecture du schéma SQL) |
 | [docs/adr/](docs/adr/) | Architecture Decision Records (format MADR) |
 
 ### Décisions d'architecture

@@ -29,3 +29,6 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+
+# Instructions locales pour assistants (Claude Code, etc.) — non versionnées
+CLAUDE.md
