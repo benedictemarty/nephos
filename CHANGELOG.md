@@ -9,6 +9,12 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Ajouté
 
+- **Squelette Alembic** :
+  - `alembic.ini` à la racine. URL injectée dynamiquement depuis `nephos.config.Settings` (donc `NEPHOS_DATABASE_URL` ou `.env`). Hook post-write `ruff format` sur les nouveaux scripts. Format de fichier daté + slug + révision.
+  - `alembic/env.py` — pas de modèles SQLAlchemy (`target_metadata = None`), Nephos étant en SQL pur. Mode online et offline supportés.
+  - `alembic/script.py.mako` — gabarit pour les nouvelles migrations (typage moderne `str | None`, `from __future__ import annotations`).
+  - `alembic/versions/20260505_0000_init_schema_v4_skos_0001.py` — première migration qui applique `schema_v4_skos.sql` en bloc via `op.execute`. Downgrade : `DROP SCHEMA … CASCADE` cohérent avec le contenu du fichier SQL. Couvre conjointement `E3-09` et `E2-08`.
+  - `alembic/README.md` — workflow documenté (`uv run alembic …`).
 - **CI GitHub Actions** :
   - `.github/workflows/ci.yml` — pipeline déclenché sur push `main`, pull-request et manuel. 6 jobs : `lint` (pre-commit complet), `type-check` (mypy strict), `security` (bandit + pip-audit), `docs-coverage` (interrogate, informatif), `test` (pytest avec matrice PostgreSQL 14 et 16, schéma v4 appliqué, couverture XML uploadée), `build` (sdist + wheel via uv build, gated sur les autres jobs). Concurrence par branche avec annulation des runs précédents.
   - `.github/workflows/nightly.yml` — exécuté à 03:00 UTC ou manuel. 2 jobs `continue-on-error` : `mutmut` (mutation testing avec Postgres réel, artefacts uploadés) et `audit-deep` (`pip-audit --strict` + `vulture`).

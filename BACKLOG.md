@@ -62,7 +62,7 @@ Réécriture du `schema_referentiel_v3.sql` en `schema_v4_skos.sql`. Voir ADR 00
 | E2-05 | Vues métier — `v_concepts_actifs`, `v_concepts_mesurables`, `v_proposals_pending`, `v_audit_recent`, `v_imports_status`, `v_concepts_traduction_pending`. | P1 | S | E2-01, E2-03 | ✅ |
 | E2-06 | Vues récursives `v_concept_descendants` / `v_concept_ancestors` (`WITH RECURSIVE`, tolérantes aux cycles). | P1 | S | E2-01 | ✅ |
 | E2-07 | Tests d'intégrité du schéma (insertions valides/invalides, contraintes hiérarchiques, intégrité des mappings). `pytest-postgresql`. | P0 | M | E2-01, E3-04 | 📋 |
-| E2-08 | Migration alembic initiale capturant le schéma v4 (point de départ versionné). | P1 | S | E2-01, E3-09 | 📋 |
+| E2-08 | Migration alembic initiale capturant le schéma v4 (point de départ versionné). | P1 | S | E2-01, E3-09 | ✅ |
 | E2-09 | Diagramme entité-relation auto-généré (`schemaspy` ou `tbls`) commité dans `docs/schema/`. | P2 | XS | E2-01 | 📋 |
 | E2-10 | Glossaire des entités SKOS (1 page) — pour onboarding non-développeur. | P2 | XS | E2-01 | 📋 |
 | E2-11 | Décision sur la conservation ou non du `schema_referentiel_v3.sql` (archive vs suppression). | P1 | XS | E2-01 | ✅ (avertissement ajouté en en-tête, conservé en référence) |
@@ -83,7 +83,7 @@ Mise en place du squelette technique du backend Python.
 | E3-06 | Pre-commit hooks complets : hygiène (EOF, trailing ws, large files, JSON/YAML/TOML), `gitleaks` (secrets), `ruff` (lint+format), `mypy` (typage strict), `bandit` (sécu statique), `deptry` (deps inutilisées/manquantes), `validate-pyproject`, `yamllint`, `markdownlint`, `sqlfluff` (final newline). Mutmut, pip-audit, vulture, interrogate déclarés en dev-deps mais hors pre-commit (invocation CI ou manuelle). Configurations correspondantes dans `pyproject.toml`, `.yamllint.yaml`, `.markdownlint.yaml`. | P0 | M | E3-01 | ✅ |
 | E3-07 | CI GitHub Actions : workflow `ci.yml` (lint via pre-commit, mypy strict, sécu bandit + pip-audit, docstring coverage interrogate, tests pytest sur Postgres 14 et 16, build sdist+wheel) + workflow `nightly.yml` (mutmut, pip-audit strict, vulture). Concurrence par branche, cancel-in-progress. | P0 | M | E3-06 | ✅ |
 | E3-08 | `Dockerfile` multi-stage (build deps → runtime slim). | P1 | S | E3-01 | 📋 |
-| E3-09 | Squelette Alembic configuré (script init, README usage). | P0 | S | E3-01, E3-04 | 📋 |
+| E3-09 | Squelette Alembic configuré : `alembic.ini`, `alembic/env.py` (URL lue depuis `Settings`, target_metadata=None car pas d'ORM), `script.py.mako`, `alembic/README.md` documentant le workflow. Première migration `0001` qui applique `schema_v4_skos.sql` en bloc (cumule E2-08). | P0 | S | E3-01, E3-04 | ✅ |
 | E3-10 | `docker-compose.yml` dev (Postgres 14 + Nephos CLI). | P1 | S | E3-08 | 📋 |
 | E3-11 | Squelette de tests (`tests/unit`, `tests/integration`) + fixtures Postgres (`pytest-postgresql`). | P0 | S | E3-02 | 📋 |
 
