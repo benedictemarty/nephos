@@ -7,6 +7,11 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ## [Non publié]
 
+### Ajouté (suite)
+
+- **ADR 0011 — Protection technique de la branche `main`** (`docs/adr/0011-protection-technique-branche-main.md`). Acte le passage de la chaîne de revue de CONTRIBUTING.md d'une politique contractuelle à un **enforcement technique** via les Branch Protection Rules GitHub (PR obligatoire, ≥1 review humaine, status checks verts, linear history, no admin bypass, no force push, no deletion). Commande `gh api` complète versionnée dans l'ADR. Procédure de rollback documentée. Couvre l'item `E1-11` (passe à ✅ une fois la commande exécutée).
+- **ADR 0012 — Gestion de la vulnérabilité PYSEC-2022-42969** (`docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md`). Acte l'ignore explicite et exclusif de cette CVE (paquet `py` 1.11.0 EOL, sans fix publié, transitive sans impact réel sur la pile). Justification, conditions de sortie (`CS1` fix amont, `CS2` retrait de l'arbre, `CS3` chemin d'exécution réel découvert), procédure de réévaluation annuelle. Item `E9-05` créé dans le backlog pour la remédiation à long terme.
+
 ### Corrigé
 
 - **CI `Security` job** — `pip-audit` échouait sur `PYSEC-2022-42969` (CVE sur `py` 1.11.0, paquet EOL sans fix publié, tiré comme transitive sans impact réel sur notre code). Ajout d'un `--ignore-vuln PYSEC-2022-42969` documenté dans le workflow. À retirer si une version corrigée de `py` apparaît ou si on parvient à le faire sortir de l'arbre.
@@ -115,3 +120,5 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 | 0008 | Conteneurisation et déploiement | À rédiger |
 | [0009](docs/adr/0009-strategie-orchestration-etl.md) | Stratégie d'orchestration ETL (Python + GHA → Kestra sur signal) | Accepté |
 | [0010](docs/adr/0010-nephos-comme-moteur-de-validation.md) | Étendre le périmètre aux outils de validation (GRIB, NetCDF, BUFR…) | Accepté |
+| [0011](docs/adr/0011-protection-technique-branche-main.md) | Protection technique de la branche `main` (Branch Protection Rules) | Accepté |
+| [0012](docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md) | Gestion de la vulnérabilité PYSEC-2022-42969 (paquet `py` EOL) | Accepté |

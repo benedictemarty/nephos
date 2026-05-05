@@ -40,7 +40,7 @@ Décisions structurantes à acter avant d'écrire du code en quantité.
 | E1-02 | ADR 0004 — Stratégie multilingue. Décision : `prefLabel@fr` ET `prefLabel@en` obligatoires sur les concepts publiés. | P0 | XS | — | ✅ |
 | E1-03 | ADR 0005 — Licences. Décision : Apache 2.0 (code) + CC-BY 4.0 (données originales) + sources amont sous licence d'origine. | P0 | S | — | ✅ |
 | E1-10 | Réservation du préfixe `nephos` sur `perma-id/w3id.org` (PR + `.htaccess` initial pointant sur placeholder). | P1 | S | E1-01 | 📋 |
-| E1-11 | Activer les **branch protection rules** sur `main` côté GitHub : PR obligatoire, ≥1 review humaine approuvée, status checks (`Lint, format, hygiene`, `Type-check (mypy strict)`, `Security (bandit, pip-audit)`, `Tests (pytest, Postgres 14)`, `Tests (pytest, Postgres 16)`, `Docstring coverage (interrogate)`, `Build sdist + wheel`), dismiss stale reviews, linear history, restrict push, no admin bypass. Appliqué via `gh api` après vérification que la CI complète passe verte. Cf. CONTRIBUTING.md § 1. | **P0** | XS | — | 🚧 |
+| E1-11 | Activer les **branch protection rules** sur `main` côté GitHub : PR obligatoire, ≥1 review humaine approuvée, 7 status checks (`Lint, format, hygiene`, `Type-check (mypy strict)`, `Security (bandit, pip-audit)`, `Tests (pytest, Postgres 14)`, `Tests (pytest, Postgres 16)`, `Docstring coverage (interrogate)`, `Build sdist + wheel`), dismiss stale reviews, linear history, restrict push, no admin bypass, no force push, no deletion, conversation resolution required. Appliqué via `gh api` (cf. ADR 0011). Validé via ADR 0012 (CVE bloquante PYSEC-2022-42969 traitée). | **P0** | XS | — | ✅ |
 | E1-12 | Configurer un **agent reviewer GitHub Actions** qui poste un rapport structuré sur chaque PR (cohérence ADR, qualité, sécurité, doc, tests, régression). Cf. CONTRIBUTING.md § 1 niveau 2. | P1 | M | E1-11 | 📋 |
 | E1-04 | ADR 0006 — Choix de la façade API (REST custom FastAPI / GraphQL via Hasura ou pg_graphql / auto-génération PostgREST). Différé en ADR 0002. | P1 | M | E2-01 | 📋 |
 | E1-05 | ADR 0007 — Outil de curation (Directus / VocBench / app custom React/TS). | P2 | M | E2-* | 📋 |
@@ -190,6 +190,7 @@ Pré-requis production. Hors MVP.
 | E9-02 | Healthcheck + readiness endpoints. | P2 | XS | E7-01 | 📋 |
 | E9-03 | Stratégie de backup/restore Postgres (`pg_dump` versionné, restore testé). | P2 | M | — | 📋 |
 | E9-04 | Runbook ops (incidents fréquents, procédures de re-sync, escalade). | P2 | S | E4-* | 📋 |
+| E9-05 | Identifier la dépendance qui ramène `py` 1.11.0 dans l'arbre et tenter de la faire sortir (mise à jour amont, alternative, fork). Conditions de sortie de l'ignore PYSEC-2022-42969 (cf. ADR 0012). | P2 | S | — | 📋 |
 
 ---
 

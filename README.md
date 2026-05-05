@@ -155,6 +155,8 @@ Voir l'en-tête commenté de `schema_v4_skos.sql` pour la lecture détaillée.
 | 0008 | Conteneurisation et déploiement | À rédiger |
 | [0009](docs/adr/0009-strategie-orchestration-etl.md) | Stratégie d'orchestration ETL (Python + GHA → Kestra sur signal) | Accepté |
 | [0010](docs/adr/0010-nephos-comme-moteur-de-validation.md) | Étendre le périmètre aux outils de validation (GRIB, NetCDF, BUFR…) | Accepté |
+| [0011](docs/adr/0011-protection-technique-branche-main.md) | Protection technique de la branche `main` (Branch Protection Rules) | Accepté |
+| [0012](docs/adr/0012-gestion-vulnerabilite-py-pysec-2022-42969.md) | Gestion de la vulnérabilité PYSEC-2022-42969 (paquet `py` EOL) | Accepté |
 
 ---
 
