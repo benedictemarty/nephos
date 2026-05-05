@@ -109,7 +109,7 @@ Implémentation des imports — partie qui livre la valeur fonctionnelle visible
 | E4-06 | Mappings **ECMWF Parameter Database** (alignement par mapping seul, pas de clone). | P1 | M | E4-01 | 📋 |
 | E4-07 | Mappings **NERC BODC** P01/P02 via SPARQL endpoint (alignement par mapping seul). | P2 | M | E4-01 | 📋 |
 | E4-08 | Détection et gestion des concepts disparus côté source (passage en `deprecated`, jamais suppression). | P1 | S | E4-01 | 📋 |
-| E4-09 | Commande `nephos import status` listant l'état de toutes les sources (dernière sync, version, nb d'overrides). | P1 | S | E4-01 | 📋 |
+| E4-09 | Commande `nephos import status` : SELECT sur la vue `gov.v_imports_status`, sortie Rich avec source/nom/licence/versions/dernière import/nb concepts/overrides. **Bug fix collatéral** : le CF importer n'écrivait pas `concept.import_source_id`, corrigé. 2 tests d'intégration. | P1 | S | E4-01 | ✅ |
 | E4-10 | Tests d'intégration : un test bout-en-bout par source, avec snapshot de la source figé en fixture. | P0 | M | E4-02..07, E3-11 | 📋 |
 
 ---
