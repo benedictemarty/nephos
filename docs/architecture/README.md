@@ -46,7 +46,7 @@ Les autres couches restent à construire :
 Ces documents sont **drafts** soumis à critique structurante. Décisions à prendre avant tout engagement :
 
 1. Sponsor exécutif identifié et engagé pour 3 ans minimum ?
-2. Cible (Météo-France seul / consortium ALADIN-ACCORD-EUMETNET / produit générique) ?
+2. Cible (l'opérateur national seul / consortium ALADIN-ACCORD-EUMETNET / produit générique) ?
 3. Budget pluri-annuel provisionné ?
 4. Équipe minimale viable identifiée et engagée ?
 

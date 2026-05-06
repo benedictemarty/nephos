@@ -8,7 +8,7 @@ lang: fr
 
 # 1. Contexte et constat
 
-Les opérateurs météorologiques nationaux (Météo-France, DWD, NOAA, MetOffice) partagent un constat structurel :
+Les opérateurs météorologiques nationaux (l'opérateur national, DWD, NOAA, MetOffice) partagent un constat structurel :
 
 - **Volumétrie hors contrôle** : 5 à 30 Po actifs, croissance non-linéaire portée par la haute résolution (modèles km-scale), les ensembles probabilistes et les nouvelles missions satellites.
 - **Réplication systémique** : chaque équipe métier (prévi, climat, aéro, recherche, climatique régional) opère ses propres copies. Multiplicateur effectif x5 à x10 sur les volumes utiles.
@@ -38,7 +38,7 @@ Trois principes fondateurs structurent toute la plateforme.
 
 | Strate | Caractère | Exemple |
 |---|---|---|
-| **Primaires** | Brutes, immuables, source de vérité | GRIB AROME, BUFR SYNOP, radar L2 |
+| **Primaires** | Brutes, immuables, source de vérité | GRIB modèle régional, BUFR SYNOP, radar L2 |
 | **Secondaires** | Calculées par recette **déterministe** versionnée | T à FL60, CAPE, cumul 6h |
 | **Produits** | Artefacts métier paramétrés (présentation) | Carte PNG, METAR, briefing |
 
@@ -139,7 +139,7 @@ Sans contract, pas de publication. Le contract est le pivot entre couches techni
 ┌────────────────────────────────────┴─────────────────────────────────────┐
 │           INGESTION (toujours pull / webhook, jamais push aveugle)       │
 │  Sources externes (GFS, IFS Open, Copernicus, AviationWeather, EUMETSAT) │
-│  Sources internes (HPC AROME / ARPEGE, RADOME, radar mosaïque, capteurs) │
+│  Sources internes (HPC modèles régionaux et globaux nationaux, réseau d'observation national, radar mosaïque, capteurs) │
 │                                                                          │
 │  → tout passe par un connecteur déclaré, contractualisé, observé         │
 └──────────────────────────────────────────────────────────────────────────┘
@@ -182,13 +182,13 @@ Les deux sont des candidats sérieux et **OSS Apache 2.0**. La décision dépend
 | Auto-materialize sur changement (mode pivot) | ✅ natif | ⚠️ via triggers explicites custom |
 | Multi-langage | ⚠️ Python d'abord | ✅ first-class (Python, JS, Groovy, etc.) |
 | UI / accessibilité non-tech | Bonne | **Excellente** (low-code, très visuelle) |
-| **Souveraineté** | États-Unis (Elementl) | **France (Kestra Technologies, Lyon)** |
+| **Souveraineté** | États-Unis (Elementl) | **UE (éditeur européen)** |
 | Maturité écosystème data engineering | Très large | En croissance |
 | Maturité écosystème workflow général | Bonne | Excellente |
 
 **Recommandation** :
 
-- **Si le sponsor pèse sur la souveraineté** (Météo-France, DGSCGC, services de l'État) : Kestra mérite d'être retenu, avec un coût documenté de ~2 mois pour recoder en Python les capacités natives Dagster (freshness + auto-materialize). Le différentiel UI et multi-langage compense l'effort.
+- **Si le sponsor pèse sur la souveraineté** (l'opérateur national, sécurité civile nationale, services de l'État) : Kestra mérite d'être retenu, avec un coût documenté de ~2 mois pour recoder en Python les capacités natives Dagster (freshness + auto-materialize). Le différentiel UI et multi-langage compense l'effort.
 - **Si l'équipe est purement data engineering Python** et que le lineage column-level + asset-aware est central : Dagster reste plus court à mettre en œuvre.
 - **Hybride réaliste** : Kestra en orchestrateur de surface (visibilité, multi-langage, gouvernance, adoption métier) + module Python custom léger (~500 lignes) pour les freshness / pivots. Évite de réimplémenter un Dagster complet.
 
@@ -239,7 +239,7 @@ Personne, équipe ou service identifié, joignable, responsable des incidents qu
 | Phase | Durée | Livrable | Périmètre |
 |---|---|---|---|
 | **POC démonstrateur** | 3-4 mois solo / 6 sem. duo | Chaîne end-to-end sur 1-2 sources | MinIO + Iceberg + orchestrateur + référentiel + résolveur sur GFS + IFS Open |
-| **Pilote interne** | 6-9 mois | Adoption par 1 équipe métier réelle | Ajout AROME / ARPEGE, OpenMetadata, premiers data contracts en prod, alerting V1, freshness V1, complétude V1 |
+| **Pilote interne** | 6-9 mois | Adoption par 1 équipe métier réelle | Ajout modèles régionaux et globaux nationaux, OpenMetadata, premiers data contracts en prod, alerting V1, freshness V1, complétude V1 |
 | **Industrialisation** | 12-18 mois | Plateforme cible en parallèle du legacy | k8s, multi-tenant, bridge HPC, retrait progressif des copies historiques |
 | **Prod Po-scale** | 24+ mois | Décommissionnement legacy | Réplication multi-site, broker NATS / Redpanda si streaming obs validé, archive ré-analyse |
 
@@ -254,13 +254,13 @@ Ces questions ne sont pas rhétoriques. Chacune **change matériellement** l'arc
 ## 7.1 — Stratégiques (sponsor)
 
 1. **Sponsor exécutif identifié ?** Sans sponsor au niveau direction, la plateforme se heurtera aux silos et aux baronnies historiques. Une plateforme transverse sans sponsor transverse meurt.
-2. **Cible : Météo-France seul, consortium européen (EUMETNET / ECMWF), ou produit générique vendable ?** Change la roadmap, le mode de financement, la gouvernance.
+2. **Cible : l'opérateur national seul, consortium européen (EUMETNET / ECMWF), ou produit générique vendable ?** Change la roadmap, le mode de financement, la gouvernance.
 3. **Migration legacy gérée comment ?** Big-bang (impossible), parallèle puis bascule (long, coûteux, prudent), greenfield sur nouveaux usages uniquement (rapide mais ne résout pas la dette) ?
 4. **Modèle économique en interne ?** Plateforme gratuite (centre de coût), facturation à l'usage (responsabilise les équipes mais alourdit), modèle showback (visibilité sans facturation) ?
 
 ## 7.2 — Architecture / techno
 
-5. **HPC Météo-France : intégration native ou bridge ?** Le code data plane fonctionne-t-il sur les calculateurs internes (Bull / Atos) ou faut-il copier vers k8s ? La réponse change radicalement le périmètre du « bring code to data ».
+5. **HPC interne (d'un opérateur national) : intégration native ou bridge ?** Le code data plane fonctionne-t-il sur les calculateurs internes (Bull / Atos) ou faut-il copier vers k8s ? La réponse change radicalement le périmètre du « bring code to data ».
 6. **Souveraineté du stockage ?** Object store on-premise (Ceph), souverain (OVH, Outscale, Scaleway, S3NS) ou cloud public (AWS / GCP) ? Contraintes RGPD, RGS, licence data WMO Resolution 40, climat.
 7. **Reprise sur incident à l'échelle Po ?** Une corruption silencieuse sur 100 To, ça se restaure en combien de temps ? Plan de continuité explicite ou pas ?
 8. **Cycle de vie des secondaires matérialisés ?** Combien de temps on les garde ? Régénération depuis primaires + recettes versionnées (cher en compute) ou rétention longue (cher en stockage) ?
@@ -287,20 +287,20 @@ Ces questions ne sont pas rhétoriques. Chacune **change matériellement** l'arc
 
 ## 7.6 — Alerting (annexe A)
 
-20. **Cible métier prioritaire ?** Vigilance Météo-France (interfaçage avec système existant), aviation (FIR, SIGMET automatisés), agro (parcelle, ETP), hydro (bassins) ? Change le modèle de zone et le partenaire d'intégration.
-21. **Niveau d'engagement légal ?** Une alerte aviation a une portée réglementaire (OACI). Une alerte vigilance préfecture engage la responsabilité publique. Quelle classe de SLA, quelle traçabilité, quelle redondance imposées ?
+20. **Cible métier prioritaire ?** Vigilance l'opérateur national (interfaçage avec système existant), aviation (FIR, SIGMET automatisés), agro (parcelle, ETP), hydro (bassins) ? Change le modèle de zone et le partenaire d'intégration.
+21. **Niveau d'engagement légal ?** Une alerte aviation a une portée réglementaire (OACI). Une alerte vigilance autorité locale engage la responsabilité publique. Quelle classe de SLA, quelle traçabilité, quelle redondance imposées ?
 22. **Modes dégradés ?** Si la plateforme principale tombe, les alertes critiques continuent-elles ? Architecture de fallback (chemin court depuis observation brute) ou échec accepté ?
 23. **Politique de silence / inhibition ?** Un opérateur peut-il temporairement masquer une alerte (« on sait, on traite ») et selon quelle gouvernance ?
 24. **Cycle de vie des règles obsolètes ?** Une règle non déclenchée depuis 5 ans : on garde, on archive, on supprime ?
 25. **Acquittement individuel ou collectif ?** Une équipe d'astreinte de 3 personnes : la première qui acquitte ferme pour tous, ou chacun doit voir et accuser ?
 26. **Multi-canalité dégradée ?** Si l'email tombe, on bascule SMS automatique (escalade) ou on attend ?
-27. **Ingestion d'alertes externes ?** Vigilance Météo-France, alertes EUMETNET MeteoAlarm, alertes Copernicus EFAS : la plateforme les **republie** ou les **rebroadcast** ?
+27. **Ingestion d'alertes externes ?** Vigilance l'opérateur national, alertes EUMETNET MeteoAlarm, alertes Copernicus EFAS : la plateforme les **republie** ou les **rebroadcast** ?
 
 ## 7.7 — Fraîcheur SLA (annexe B)
 
 28. **Engagement contractuel ou best-effort ?** Quels datasets ont un SLA *garanti* (avec pénalité, ressources dédiées) vs *best-effort* (« on essaie ») ?
 29. **Modèle de causes amont** : quand NOMADS est en retard, est-ce que c'est *leur* problème ou *le nôtre* ? Politique d'imputation, contractualisation avec sources amont.
-30. **Cascade acceptable** : si AROME est en retard de 30 min, est-ce qu'on accepte que la diffusion soit en retard de 30 min, ou on bascule sur un fallback (GFS dégradé) automatiquement ?
+30. **Cascade acceptable** : si le modèle régional est en retard de 30 min, est-ce qu'on accepte que la diffusion soit en retard de 30 min, ou on bascule sur un fallback (GFS dégradé) automatiquement ?
 31. **Réseau OPS hors heures ouvrées** : un retard détecté à 03:00 UTC, qui est notifié, comment, jusqu'à quand on attend avant escalade ?
 32. **Reporting SLA** : à qui, à quelle fréquence, sous quel format ?
 33. **Politique de purge des partitions manquantes** : un cycle attendu jamais arrivé reste « missing » à perpétuité ou on l'archive en `permanently_unavailable` après N jours ?
@@ -341,7 +341,7 @@ Ces questions ne sont pas rhétoriques. Chacune **change matériellement** l'arc
 56. **Saisie citoyenne encadrée** : intégration de plateformes citoyennes (signalement vigilance crues, qualité air locale) via API. Confiance, modération, validation ?
 57. **Pièces jointes (photos, vidéos)** : politique de rétention, anonymisation (visages, plaques), conformité RGPD. Lifecycle distinct des données tabulaires.
 58. **Audit de saisie** : quel niveau d'enregistrement (user agent, geoloc, version DataWindow) ? Contraintes RGPD vs traçabilité opérationnelle.
-59. **Synchronisation avec systèmes métier externes** : SI pompiers, préfectures, sécurité civile — la plateforme est-elle source ou consommatrice ? Politique d'API et engagement contractuel.
+59. **Synchronisation avec systèmes métier externes** : SI pompiers, autorités locales, sécurité civile — la plateforme est-elle source ou consommatrice ? Politique d'API et engagement contractuel.
 
 ## 7.12 — Modification d'une valeur existante (annexe G)
 
@@ -352,12 +352,12 @@ Ces questions ne sont pas rhétoriques. Chacune **change matériellement** l'arc
 64. **Cascade downstream très large** : une correction qui invalide 200 secondaires et 1000 produits — rejouer tout, prévenir, demander validation supplémentaire ?
 65. **Override prévisionniste vs correction** : journalisés séparément ? Beaucoup d'opérateurs (NOAA, MetOffice) les distinguent.
 66. **Responsabilité légale** : qui est responsable d'une correction tardive d'un METAR aviation qui aurait pu prévenir un incident ?
-67. **Format de diffusion d'event de correction** : OACI prévoit `COR` sur METAR ; pour les autres flux (API tiers, webhooks préfecture), quel format standard adopter ?
+67. **Format de diffusion d'event de correction** : OACI prévoit `COR` sur METAR ; pour les autres flux (API tiers, webhooks autorité locale), quel format standard adopter ?
 68. **Conservation des chaînes de versions** : 5 ans (réglementaire OACI), 30 ans (climat), perpétuelle ? Politique par type de donnée.
 
 ## 7.13 — Politiques d'accès et classifications (annexe H)
 
-69. **Périmètre de classification** : L0/L1/L2/L3 retenu ou modèle existant Météo-France à recoder ? Cohérence avec IGI 1300, OACI, RGPD à valider avec juriste.
+69. **Périmètre de classification** : L0/L1/L2/L3 retenu ou modèle existant l'opérateur national à recoder ? Cohérence avec IGI 1300, OACI, RGPD à valider avec juriste.
 70. **Plateforme L3 défense** : plateforme jumelle complète ou enclave isolée ? Niveau de cloisonnement réseau (air gap, diode, VPN classifié) ?
 71. **Attribution des habilitations** : auto-déclaratif (contrôle a posteriori), comité, intégration RH automatique, cycle de re-validation ?
 72. **Embargos opérationnels** (vigilance, sécurité civile) : qui décide de la levée, sous quelle gouvernance, quelle traçabilité ?
@@ -366,7 +366,7 @@ Ces questions ne sont pas rhétoriques. Chacune **change matériellement** l'arc
 75. **Tests de fuites par recoupement** : red team interne pour valider qu'un consumer L0 ne peut pas reconstituer L1 par jointure ? Politique de test.
 76. **DPO et chaîne juridique** : qui valide les access contracts, qui répond aux demandes RGPD, en combien de temps ?
 77. **Recherche académique** : politique d'agrément, sandbox isolée, possibilité de publication, vérification non-commerciale ?
-78. **Souveraineté de stockage** : résidence France métropole imposée pour L1+ ? Cloud souverain (S3NS, OVH, Outscale) imposé ou cloud public toléré pour L0 ?
+78. **Souveraineté de stockage** : résidence périmètre national imposée pour L1+ ? Cloud souverain (S3NS, OVH, Outscale) imposé ou cloud public toléré pour L0 ?
 
 \newpage
 
@@ -455,7 +455,7 @@ channels:
   - type: email
     template: alert.severe-wind.v2
   - type: webhook
-    endpoint: https://api.prefecture31.gouv.fr/alerts
+    endpoint: https://api.autorite-locale.gouv.fr/alerts
 state_machine:
   open_after: 1 evaluation
   resolved_after: 3 evaluations under threshold
@@ -513,7 +513,7 @@ Sans alert contract en Git, **pas d'alerte en prod**.
 
 ## B.1 Le problème
 
-En météo, **l'absence d'une donnée est elle-même une donnée**. Une prévision AROME qui ne sort pas à l'heure prévue, c'est un signal critique :
+En météo, **l'absence d'une donnée est elle-même une donnée**. Une prévision modèle régional qui ne sort pas à l'heure prévue, c'est un signal critique :
 
 - La carte H+0 est vide ou périmée.
 - L'alerte vigilance ne peut plus être évaluée.
@@ -584,7 +584,7 @@ nwp.gfs.t_pl@cycle=12z              expected: 13:45  actual: 14:30  late=45min  
 secondary.t_at_FL.gfs@cycle=12z     expected: 14:00  actual: 14:32  late=32min  cause=upstream-cascade
    │
    ▼ derived_from
-product.maps.t_FL60.france@12z      expected: 14:15  actual: 14:35  late=20min  cause=upstream-cascade
+product.maps.t_FL60.zone@12z      expected: 14:15  actual: 14:35  late=20min  cause=upstream-cascade
    │
    ▼ consumed_by
 alert.eval.vigilance.vent.12z       expected: 14:30  actual: 14:30  late=0min   degraded_data=true
@@ -620,7 +620,7 @@ alert.eval.vigilance.vent.12z       expected: 14:30  actual: 14:30  late=0min   
 
 Distinct du retard. Un dataset peut être **présent mais incomplet** :
 
-- GRIB AROME publié, mais 3 paramètres sur 50 manquent (post-processing échoué).
+- GRIB modèle régional publié, mais 3 paramètres sur 50 manquent (post-processing échoué).
 - BUFR SYNOP arrivé, mais sans la pression au mer.
 - Radar mosaïque arrivée, mais 2 radars sur 30 manquants.
 - Satellite : 1 canal sur 16 corrompu.
@@ -681,7 +681,7 @@ Politiques disponibles :
 
 Aujourd'hui Iceberg trace lineage **table-à-table**. Pour la météo, on a besoin de **lineage par champ / variable** :
 
-- Le secondaire `cape_calculé` dépend de `t_pl`, `q_pl`, `p_sl` du primaire AROME.
+- Le secondaire `cape_calculé` dépend de `t_pl`, `q_pl`, `p_sl` du primaire modèle régional.
 - Si `q_pl` (humidité) manque dans un cycle, alors `cape_calculé` ne peut pas être produit.
 - Mais si seul `cloud_cover` (optional) manque, `cape_calculé` est produit normalement.
 
@@ -748,7 +748,7 @@ nwp.arome.publish.0p025deg@cycle=12z       state=partial   completeness=94%
                                             (cloud info reduced)
 ```
 
-Chaque ligne est un **événement gouverné**. La cause et la dépendance par champ sont tracées. Un consommateur final voit immédiatement *« le briefing aviation est dégradé parce que la couverture nuageuse à 850hPa est manquante côté AROME »*.
+Chaque ligne est un **événement gouverné**. La cause et la dépendance par champ sont tracées. Un consommateur final voit immédiatement *« le briefing aviation est dégradé parce que la couverture nuageuse à 850hPa est manquante côté modèle régional »*.
 
 ## C.7 Anti-patterns à bannir
 
@@ -863,8 +863,8 @@ Les sources réelles ne sont **jamais** au format souhaité. Quelques cas concre
 - **NOMADS GFS** : GRIB1 ou GRIB2, variables nommées selon ECMWF GRIB tables, pas CF.
 - **IFS Open Data** : GRIB2 + index `.idx`, à parser à part.
 - **EUMETSAT MSG** : NetCDF3 ou format propriétaire, projection geostationnaire.
-- **HPC Météo-France** : sortie GRIB0 (format obsolète) ou format interne hérité (FA / LFI Aladin / FA AROME).
-- **RADOME** : BUFR avec encodage spécifique, parfois non-standard.
+- **HPC interne** (d'un opérateur national) : sortie GRIB0 (format obsolète) ou formats internes hérités (FA, LFI, et autres formats propriétaires de chaînes nationales).
+- **Réseau d'observation national** : BUFR avec encodage spécifique, parfois non-standard.
 - **Satellite L1** : formats constructeurs (Sentinel-3 SAFE, etc.).
 
 Aucun de ces formats ne peut être exposé tel quel comme **primaire gouverné**. Une étape de **normalisation** est nécessaire — pour les sources externes ET internes.
@@ -903,7 +903,7 @@ Aucun de ces formats ne peut être exposé tel quel comme **primaire gouverné**
 
 ## E.3 Pas de différence interne / externe
 
-Une sortie HPC interne `AROME GRIB0` et un fichier externe `GFS GRIB1 NOMADS` suivent **le même chemin architectural** :
+Une sortie HPC interne `modèle régional GRIB0` et un fichier externe `GFS GRIB1 NOMADS` suivent **le même chemin architectural** :
 
 1. Atterrissage en zone **raw** (S3 bucket dédié, namespace par source).
 2. **Recette de normalisation versionnée** : code Python ou Spark, idempotent, taggé Git.
@@ -950,7 +950,7 @@ owner: equipe-ingestion
 
 ## E.5 Cas particulier : formats internes legacy
 
-Pour les formats HPC internes (GRIB0, FA Aladin/AROME, formats custom) :
+Pour les formats HPC internes (GRIB0, FA Aladin/modèle régional propriétaire, formats custom) :
 
 - **Phase 1 (POC / pilote)** : recettes de conversion versionnées, traduisent vers Zarr/GRIB2.
 - **Phase 2 (industrialisation)** : engagement avec les équipes HPC pour produire **directement** en format standard plateforme. Le format legacy est mis en sunset.
@@ -973,7 +973,7 @@ Pour les formats HPC internes (GRIB0, FA Aladin/AROME, formats custom) :
 | Conversion GRIB | **eccodes** (lib ECMWF) + **xarray + cfgrib** |
 | Conversion BUFR | **eccodes** + **pdbufr** |
 | Conversion NetCDF | **xarray + netcdf4** |
-| Conversion FA / LFI / autres formats internes | bibliothèques Météo-France ad-hoc, encapsulées en module Python plateforme |
+| Conversion FA / LFI / autres formats internes | bibliothèques l'opérateur national ad-hoc, encapsulées en module Python plateforme |
 | Mapping variables source → CF | tables YAML versionnées, intégrées au glossaire référentiel |
 | Conversion d'unités | **QUDT** + module Python `pint-qudt` |
 | Reprojection / régrillage | **xesmf** (regridding) ou **pyproj** (projection) |
@@ -998,7 +998,7 @@ C'est le point qui empêche la réplication.
 
 | Anti-pattern | Pattern correct |
 |---|---|
-| Les feux sont saisis dans le SI pompiers, copiés en CSV vers Météo-France une fois par jour | Les feux sont saisis directement dans la plateforme, le SI pompiers consomme via API |
+| Les feux sont saisis dans le SI pompiers, copiés en CSV vers l'opérateur national une fois par jour | Les feux sont saisis directement dans la plateforme, le SI pompiers consomme via API |
 | L'app de saisie a sa propre base Postgres et ses propres règles | L'app de saisie est une UI sur le data contract, validation centralisée |
 | Les corrections sont faites en UPDATE sur la base d'origine | Toute correction est un nouvel événement (lineage `corrects: ...`) |
 
@@ -1013,7 +1013,7 @@ storage: iceberg.obs.feux_foret
 schema:
   - feu_id              uuid, PK
   - observed_at         timestamp UTC, mandatory
-  - lat                 float, mandatory, range [41.0, 51.5]    # France métro
+  - lat                 float, mandatory, range [41.0, 51.5]    # zone nationale
   - lon                 float, mandatory, range [-5.0, 10.0]
   - surface_ha          float, mandatory, range [0, 100000]
   - intensity           enum [low, medium, high, extreme]
@@ -1025,7 +1025,7 @@ schema:
   - source              enum [terrain, aerial, satellite, citizen]
   - corrects            uuid, nullable, fk → feu_id (chaîne de corrections)
 quality_rules:
-  - lat/lon dans le polygone France métropolitaine (PostGIS contains)
+  - lat/lon dans le polygone périmètre national (PostGIS contains)
   - surface_ha cohérente avec intensity (sanity check)
   - status transitions valides : draft → validated | retracted
   - immutable_after_validation: [observed_at, lat, lon]
@@ -1079,7 +1079,7 @@ owner: equipe-securite-civile
 | Flux | Producteur | Exemple | Connecteur | Aboutissement |
 |---|---|---|---|---|
 | Ingestion automatique externe | Sources publiques | GFS, IFS, EUMETSAT | HTTP poll, S3 sync, webhook | primaire gouverné |
-| Diffusion HPC interne | Calculateurs internes | AROME, ARPEGE GRIB0 | NFS shared, webhook fin de run | primaire gouverné |
+| Diffusion HPC interne | Calculateurs internes | Sortie HPC modèles régional+global GRIB0 | NFS shared, webhook fin de run | primaire gouverné |
 | Saisie humaine | Opérateurs, citoyens encadrés | Feux, dégâts, observations manuelles | DataWindow + API REST | primaire gouverné |
 
 Le SI ne distingue pas ces flux **après** normalisation/validation. Tous sont des primaires gouvernés en Iceberg, tous ont un data contract, tous ont un lineage.
@@ -1117,7 +1117,7 @@ Aucune valeur n'est jamais modifiée. Toute opération sur une valeur existante 
 
 C'est la règle qui permet :
 
-- **Auditabilité** légale (aviation OACI, vigilance préfecture).
+- **Auditabilité** légale (aviation OACI, vigilance autorité locale).
 - **Reproductibilité** scientifique (rejouer une étude climatologique avec les données telles qu'elles étaient en 2005).
 - **Cascade fiable** : connaître exactement quelles données dépendaient d'une valeur modifiée.
 
@@ -1180,7 +1180,7 @@ Les consumers métier lisent **`current`** par défaut. Audits, études, replays
 1. **L'opérateur identifie** une valeur à modifier (correction ou override).
 2. **Justification obligatoire** : un texte non vide expliquant pourquoi (`reason: "capteur en panne, mesure 5°C cohérente avec stations voisines"`). Bloquant en validation.
 3. **Émission d'un event** avec parent pointant vers l'event original. Statut `draft`.
-4. **Validation 2-yeux** si la criticité l'exige (METAR aviation, vigilance préfecture) : un superviseur signe, statut → `validated`.
+4. **Validation 2-yeux** si la criticité l'exige (METAR aviation, vigilance autorité locale) : un superviseur signe, statut → `validated`.
 5. **Publication** : statut → `published`, le `current` est mis à jour pour pointer vers ce nouvel event.
 6. **Cascade downstream** : tous les secondaires / produits / alertes qui ont consommé l'ancienne valeur sont automatiquement invalidés et rejoués via le mode pivot de l'orchestrateur.
 7. **Notification consumers externes** : event `data_correction` émis sur le bus interne et republié vers les consumers tiers (API, webhook, AMSS aviation).
@@ -1197,8 +1197,8 @@ obs.synop.lfpg.t@13:00 (v1 = -50°C original) ───┐
 obs.synop.lfpg.t@13:00 (v2 = +5°C corrected) ───┐
                                                  │
                                                  ▼ invalide downstream
-secondary.france.t.gridded@13:00     → rebuilt   │
-product.maps.t.france@13:00          → rebuilt   │
+secondary.zone.t.gridded@13:00     → rebuilt   │
+product.maps.t.zone@13:00          → rebuilt   │
 alert.canicule.eval@13:00            → re-evaluated, peut être annulée
 metar.lfpg@13:00                     → COR émis vers AMSS aviation
 ```
@@ -1212,7 +1212,7 @@ Si la valeur fausse a été **diffusée** (METAR officiel, vigilance, API tiers)
 | Canal | Mécanisme de correction publique |
 |---|---|
 | METAR aviation | Émission d'un METAR `COR` (correction) conforme OACI Annexe 3 |
-| Vigilance préfecture | Bulletin de correction explicite, traçabilité légale |
+| Vigilance autorité locale | Bulletin de correction explicite, traçabilité légale |
 | API REST / GraphQL | Header `X-Data-Correction-Of: <event_id>` + content updated |
 | Webhook abonné | Push d'un event `data.correction` sur l'abonnement |
 | Diffusion publique web | Marqueur visible (« donnée corrigée le ... ») + lien vers historique |
@@ -1264,7 +1264,7 @@ Si la valeur fausse a été **diffusée** (METAR officiel, vigilance, API tiers)
 |---|---|
 | **POC** | Modèle event-sourcing sur 1 dataset (saisie feux), workflow correction simple, cascade démontrée sur 1 secondaire |
 | **Pilote** | Workflow validation 2-yeux, audit UI, intégration sur tous les datasets pilote |
-| **Industrialisation** | Diffusion publique des corrections (METAR-COR, webhook préfectures), conformité OACI |
+| **Industrialisation** | Diffusion publique des corrections (METAR-COR, webhook autorités locales), conformité OACI |
 | **Prod** | SLA garantis sur cascade (rejeu < 5 min), audit temps réel, intégration avec systèmes métier externes |
 
 \newpage
@@ -1372,7 +1372,7 @@ allowed_audiences:
     requires_research_agreement: true
 denied_audiences:
   - role: anonymous (sauf après public_after)
-data_residency: france_metro
+data_residency: national_territory
 encryption_at_rest: AES-256-GCM
 encryption_in_transit: TLS 1.3
 audit_level: nominal_with_dataset_dimensions
@@ -1483,7 +1483,7 @@ Le code et les modèles peuvent être identiques entre les deux plateformes, **l
 | **POC** | OPA + Lakekeeper basique, classification L0/L1 sur 2 datasets, audit log Iceberg minimal |
 | **Pilote** | L2 avec chiffrement différencié, audit complet, intégration Keycloak, tests de fuites |
 | **Industrialisation** | Embargo gouverné, capteurs privés exclusivité, RGPD opérationnel, DPO intégré au workflow |
-| **Prod** | Plateforme jumelle L3 si Météo-France valide ce périmètre, conformité IGI 1300 documentée, re-validation annuelle automatisée |
+| **Prod** | Plateforme jumelle L3 si l'opérateur national valide ce périmètre, conformité IGI 1300 documentée, re-validation annuelle automatisée |
 
 \newpage
 
@@ -1496,7 +1496,7 @@ Le document couvre quatre familles d'événements gouvernés et trois flux d'ent
 | Famille | Source | Public | Annexe |
 |---|---|---|---|
 | **Données** (primaires, secondaires, produits) | Plateforme principale | Consumers métier | Corps |
-| **Alertes métier** (dépassement seuil) | Alert contracts + moteur d'évaluation | Vigilance, préfectures, aviation | A |
+| **Alertes métier** (dépassement seuil) | Alert contracts + moteur d'évaluation | Vigilance, autorités locales, aviation | A |
 | **Fraîcheur** (retard, indisponibilité) | Freshness policies + état gouverné | Ops, dataops, SLA reporting | B |
 | **Complétude** (runs partiels, dégradés) | Manifestes de complétude + lineage column-level | Ops, métiers consumers | C |
 

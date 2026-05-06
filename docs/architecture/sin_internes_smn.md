@@ -37,68 +37,7 @@ Ces systèmes :
 
 Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la résistance au changement** ainsi que les coûts de migration.
 
-\newpage
-
-# 2. Météo-France (informations publiques)
-
-## 2.1 Chaînes de modélisation et production
-
-| Composant | Périmètre | Statut public |
-|---|---|---|
-| **ARPEGE** | Modèle global, opérationnel depuis 1993, héritage long | Description publique, code partiellement partagé en consortium ALADIN |
-| **AROME** | Modèle haute résolution France, depuis 2008 | Description publique, consortium ACCORD (ex-ALADIN/HIRLAM/LACE/RC LACE) |
-| **AROME-Outre-Mer** | Versions régionales | Documenté |
-| **ARPEGE-Climat** | Modèle climat dérivé d'ARPEGE | Documenté, contributions CMIP |
-| **Mocage** | Modèle qualité de l'air | Documenté, partagé recherche |
-| **Olive / SUITE OLIVE** | Environnement de chaîne de production opérationnelle (orchestration des runs HPC) | Référencé dans présentations, peu documenté en détail public |
-
-**Pertinence pour la cible** : ces chaînes produisent les **primaires** que la plateforme cible doit ingérer. Leurs formats de sortie (souvent FA / LFI hérités, GRIB) imposent une **étape de normalisation**, traitée dans l'annexe E du document technique.
-
-## 2.2 Systèmes de production prévi et vigilance
-
-| Composant | Périmètre | Statut public |
-|---|---|---|
-| **Synergie** | Système d'aide à la prévision (visualisation, élaboration de bulletins) | Référencé, peu documenté en détail |
-| **VIGI / Vigilance** | Système de production de la vigilance météorologique (préfectures, public) | Connu fonctionnellement |
-| **Synopsis / Synergie Mer** | Production prévision marine | Référencé |
-| **Cymepoint / Olympia** | Outils internes anciennes générations | Évoqués historiquement |
-
-**Pertinence pour la cible** : ces systèmes consomment la donnée météo et produisent des artefacts métier (bulletins, vigilance). Ce sont les **principaux clients internes** de la plateforme cible. Migration progressive avec double-lecture.
-
-## 2.3 Systèmes d'archivage et de gestion d'observations
-
-| Composant | Périmètre | Statut public |
-|---|---|---|
-| **BDClim** | Base climatologique nationale (observations homogénéisées long terme) | Connue, accès partiel via portail Climathèque |
-| **Climsoft** | Anciennement utilisé pour gestion stations | Évoqué |
-| **BDPE / BDP** | Base de données prévision étendue, archive de produits | Référencée |
-| **Climathèque** | Portail public d'accès données climatologiques | Public, payant |
-| **Bdraffix / Bdcoba** | Bases historiques internes | Mentions dans publications anciennes |
-| **CDPP** | Collecte et traitement données ponctuelles (station, BUFR) | Référencé |
-| **Métronome** | Système de réception/diffusion AMSS aviation | Référencé |
-
-**Pertinence pour la cible** : la BDClim et la BDPE sont **patrimoniales**. Toute migration doit garantir la **continuité d'accès historique** sur des données de 30+ ans. Conservation et lisibilité long terme = exigence forte (cf. Annexe D du document technique).
-
-## 2.4 Visualisation et diffusion
-
-| Composant | Périmètre | Statut public |
-|---|---|---|
-| **Synergie** | Visualisation prévi (déjà cité) | |
-| **Météo-France API** | Portail API développé récemment, ouverture progressive | Public, en croissance |
-| **Données publiques** | Portail open data / portail API (data.gouv.fr) | Public |
-
-## 2.5 Initiatives récentes connues publiquement
-
-- **Migration progressive vers le cloud** (publique mais limitée à du PaaS).
-- **Adoption progressive de Python / xarray / Zarr** dans la recherche.
-- **Modernisation API publiques** (api.meteofrance.com en 2023+).
-- **Participation Pangeo** dans certains projets recherche.
-
-**À retenir** : Météo-France a un patrimoine SI **lourd, hétérogène, partiellement modernisé**. La cible doit composer avec un legacy 30+ ans et des chaînes opérationnelles en service H24, sans rupture acceptable.
-
-\newpage
-
-# 3. ECMWF (informations publiques)
+# 2. ECMWF (informations publiques)
 
 ## 3.1 Chaînes opérationnelles et modèles
 
@@ -124,7 +63,7 @@ Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la r�
 | **ATLAS** | OSS récent | Bibliothèque de modélisation NWP nouvelle génération (C++) |
 | **fdb (Field Database)** | Partiellement OSS | Système de stockage de champs en ligne |
 
-**Pertinence pour la cible** : ECMWF est **le service le plus prolifique en OSS** dans la météo. Plusieurs briques (ecCodes, MIR, Magics, Metview, Polytope, ATLAS, fdb) sont **directement réutilisables** dans une cible française. ECMWF a **investi consciemment dans l'open source** ces dernières années — bénéfice à capter.
+**Pertinence pour la cible** : ECMWF est **le service le plus prolifique en OSS** dans la météo. Plusieurs briques (ecCodes, MIR, Magics, Metview, Polytope, ATLAS, fdb) sont **directement réutilisables** dans une cible nationale. ECMWF a **investi consciemment dans l'open source** ces dernières années — bénéfice à capter.
 
 ## 3.3 Initiatives récentes
 
@@ -133,11 +72,11 @@ Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la r�
 - **AIFS (AI Forecasting System)** : modèle AI publié 2024-2025, ouvert.
 - **Migration vers Bologne** : nouveau data centre HPC, plus moderne.
 
-**À retenir** : ECMWF est un **partenaire** plus qu'un concurrent. Toute cible française gagne à s'**aligner** sur les briques ECMWF OSS et à **contribuer**.
+**À retenir** : ECMWF est un **partenaire** plus qu'un concurrent. Toute cible nationale gagne à s'**aligner** sur les briques ECMWF OSS et à **contribuer**.
 
 \newpage
 
-# 4. DWD — Deutscher Wetterdienst (Allemagne)
+# 3. DWD — Deutscher Wetterdienst (Allemagne)
 
 ## 4.1 Chaînes et modèles
 
@@ -159,11 +98,11 @@ Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la r�
 
 **NinJo** est un cas remarquable. Workstation prévi développée par DWD à partir de 2002, **mutualisée** avec d'autres services nationaux : MeteoSwiss, Bundeswehr (météo militaire allemande), Bureau of Meteorology Australie, KNMI Pays-Bas (partiellement). Modèle de **partage entre services nationaux** sur un outil métier critique.
 
-**Pertinence pour la cible** : NinJo prouve qu'un **partage entre services météo** est possible sur des outils métier. Modèle inspirant pour des collaborations futures (par exemple Météo-France / Belgique / Suisse / Maroc / etc.).
+**Pertinence pour la cible** : NinJo prouve qu'un **partage entre services météo** est possible sur des outils métier. Modèle inspirant pour des collaborations futures (par exemple l'opérateur national / Belgique / Suisse / Maroc / etc.).
 
 \newpage
 
-# 5. MetOffice (Royaume-Uni)
+# 4. MetOffice (Royaume-Uni)
 
 ## 5.1 Chaînes et modèles
 
@@ -186,7 +125,7 @@ Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la r�
 
 \newpage
 
-# 6. NOAA et NWS (États-Unis)
+# 5. NOAA et NWS (États-Unis)
 
 ## 6.1 Chaînes et modèles
 
@@ -210,7 +149,7 @@ Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la r�
 
 \newpage
 
-# 7. Autres services météo nationaux
+# 6. Autres services météo nationaux
 
 ## 7.1 JMA (Japon)
 
@@ -245,14 +184,14 @@ Comprendre ces SI internes aide à **calibrer** la cible et à **anticiper la r�
 
 \newpage
 
-# 8. Composants partagés entre services météo
+# 7. Composants partagés entre services météo
 
 Quelques composants ont été **mutualisés** ou **co-développés** entre plusieurs services nationaux. À étudier comme modèles de coopération.
 
 | Composant | Services impliqués | Type |
 |---|---|---|
 | **NinJo** | DWD, MeteoSwiss, BOM, Bundeswehr, KNMI partiel | Workstation prévi (Java) |
-| **ecCodes** | ECMWF + adoption mondiale (NOAA, MF, MetOffice, etc.) | Bibliothèque GRIB/BUFR (OSS) |
+| **ecCodes** | ECMWF + adoption mondiale (NOAA, autres opérateurs nationaux, MetOffice, etc.) | Bibliothèque GRIB/BUFR (OSS) |
 | **Unified Model** | MetOffice + Australie + Inde + Corée + Nouvelle-Zélande | Modèle NWP (consortium) |
 | **ALADIN / ACCORD** | France, Belgique, Hongrie, Maroc, Tunisie, Algérie, Bulgarie, etc. (16+ pays) | Modèle régional consortium |
 | **HIRLAM** (fusionné dans ACCORD) | Pays nordiques + autres | Modèle régional |
@@ -260,11 +199,11 @@ Quelques composants ont été **mutualisés** ou **co-développés** entre plusi
 | **OpenIFS** | ECMWF + adoption recherche mondiale | Modèle global éducation |
 | **STAC** (standard) | Adoption croisée (EUMETSAT, NASA, Microsoft, etc.) | Standard catalogue |
 
-**Pertinence pour la cible** : la **mutualisation entre services nationaux est un modèle prouvé**. Inspirer la cible française par cette logique : développer comme bien commun ce qui peut l'être, plutôt que développer pour soi seul.
+**Pertinence pour la cible** : la **mutualisation entre services nationaux est un modèle prouvé**. Inspirer la cible nationale par cette logique : développer comme bien commun ce qui peut l'être, plutôt que développer pour soi seul.
 
 \newpage
 
-# 9. Patterns observés dans les SI internes
+# 8. Patterns observés dans les SI internes
 
 Quelques **patterns transverses** que l'on retrouve chez la plupart des services :
 
@@ -300,13 +239,13 @@ Vigilance, METAR, SIGMET, cartographie publique, briefings : chaque service a **
 
 ## 9.6 Open source : adoption tardive mais croissante
 
-ECMWF mène. Météo-France, DWD, MetOffice, NOAA suivent. Pangeo accélère.
+ECMWF mène. l'opérateur national, DWD, MetOffice, NOAA suivent. Pangeo accélère.
 
 **Conséquence pour la cible** : la cible peut être **construite OSS de bout en bout** sans pari technologique fou — c'est la direction industrielle.
 
 \newpage
 
-# 10. Ce que ces SI internes nous apprennent pour la cible
+# 9. Ce que ces SI internes nous apprennent pour la cible
 
 ## 10.1 La cible n'est pas une refonte des chaînes
 
@@ -335,7 +274,7 @@ Le strangler pattern décrit dans la section 12 du document fonctionnel **est ob
 
 ## 10.5 La cible peut être un bien commun
 
-L'exemple NinJo (DWD partagé), l'exemple ALADIN/ACCORD (France + 15 pays), l'exemple Unified Model (MetOffice + Australie + Corée) montrent que **la mutualisation entre services nationaux fonctionne** sur un produit métier critique. La cible française pourrait :
+L'exemple NinJo (DWD partagé), l'exemple ALADIN/ACCORD (consortium régional, 16 pays), l'exemple Unified Model (MetOffice + Australie + Corée) montrent que **la mutualisation entre services nationaux fonctionne** sur un produit métier critique. La cible nationale pourrait :
 
 - Co-développer avec un consortium (EUMETNET, ALADIN/ACCORD, autres).
 - Proposer en open source pour adoption tierce (modèle ECMWF récent).
@@ -345,7 +284,7 @@ C'est une **opportunité géopolitique** au-delà du seul intérêt technique.
 
 \newpage
 
-# 11. Risques spécifiques aux migrations de SI internes
+# 10. Risques spécifiques aux migrations de SI internes
 
 | Risque | Manifestation | Mitigation |
 |---|---|---|
@@ -355,11 +294,11 @@ C'est une **opportunité géopolitique** au-delà du seul intérêt technique.
 | Sous-estimation du coût de re-certification OACI / WMO / RGPD | Conformité perdue temporairement | Plan de re-certification chiffré dataset par dataset |
 | Concurrence entre cibles internes (chaque direction veut sa plateforme) | Énième silo créé | Sponsor exécutif transverse, charte single-source |
 | Refus d'ouverture (« on ne peut pas, c'est sensible ») sans audit réel | Cible cantonnée à un périmètre étroit | Classification fine (L0-L3), pas catch-all « tout sensible » |
-| Patrimoine OSS Météo-France faible vs ECMWF | Recrutement difficile, dépendance fournisseurs | Investissement RH formation + contribution OSS visible |
+| Patrimoine OSS l'opérateur national faible vs ECMWF | Recrutement difficile, dépendance fournisseurs | Investissement RH formation + contribution OSS visible |
 
 \newpage
 
-# 12. Synthèse
+# 11. Synthèse
 
 ## 12.1 Le paysage est plus riche qu'il n'y paraît
 
@@ -368,14 +307,14 @@ Au-delà des plateformes ouvertes (benchmark précédent), les services météo 
 ## 12.2 Trois leçons clés
 
 1. **La cible plateforme data n'est pas la refonte des chaînes opérationnelles**. Distinguer impérativement.
-2. **Plusieurs services ont déjà ouvert leur catalogue ou diffusion** (NOAA BDP, Copernicus). Aucun n'a encore unifié glossaire + catalogue + contract + politique d'accès dans une plateforme cohérente. **C'est la position défendable de la cible française**.
-3. **La mutualisation est possible et prouvée** sur des produits métier (NinJo, ALADIN/ACCORD, UM consortium). La cible française gagnerait à s'inscrire dans une logique de **bien commun ouvert**.
+2. **Plusieurs services ont déjà ouvert leur catalogue ou diffusion** (NOAA BDP, Copernicus). Aucun n'a encore unifié glossaire + catalogue + contract + politique d'accès dans une plateforme cohérente. **C'est la position défendable de la cible nationale**.
+3. **La mutualisation est possible et prouvée** sur des produits métier (NinJo, ALADIN/ACCORD, UM consortium). La cible nationale gagnerait à s'inscrire dans une logique de **bien commun ouvert**.
 
 ## 12.3 Implication pour le sponsor
 
-Construire la cible française **isolément** = effort important, valeur captée seule.
+Construire la cible nationale **isolément** = effort important, valeur captée seule.
 
-Construire la cible française **comme socle ouvert pour le consortium ALADIN/ACCORD ou EUMETNET** = effort partagé, valeur captée collectivement, leadership technique européen, soutien financier potentiellement plus large.
+Construire la cible nationale **comme socle ouvert pour le consortium ALADIN/ACCORD ou EUMETNET** = effort partagé, valeur captée collectivement, leadership technique européen, soutien financier potentiellement plus large.
 
 C'est une **option stratégique majeure** à instruire en amont du POC.
 

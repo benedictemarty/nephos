@@ -32,7 +32,7 @@ Ce document **n'est pas une décision** ; il est un cadre de discussion structur
 
 **Coût estimé (ordres de grandeur, à préciser).** Investissement RH 3 ans : 4-8 M€ selon ampleur. Infra cible : 0,5 à 2 M€/an selon souveraineté retenue. Coût du non-changement (extrapolation conservative du surcoût stockage actuel à volumétrie projetée) : potentiellement 5-15 M€/an d'ici 5 ans, à mesurer en audit.
 
-**Décision attendue.** Sponsor exécutif engagé, périmètre cible (Météo-France seul / consortium / produit), budget pluri-annuel, équipe dédiée, mandat de gouvernance transverse. Sans ces quatre, ce document reste un exercice intellectuel.
+**Décision attendue.** Sponsor exécutif engagé, périmètre cible (l'opérateur national seul / consortium / produit), budget pluri-annuel, équipe dédiée, mandat de gouvernance transverse. Sans ces quatre, ce document reste un exercice intellectuel.
 
 **Risque principal.** Pas la technologie. C'est l'adoption par les équipes métier en place et la persistance du sponsorship sur 3 ans, à travers les changements de direction.
 
@@ -59,7 +59,7 @@ Pour les choix techniques (composants OSS, stack, déploiement), se reporter au 
 - Le document **part d'hypothèses sur l'existant**, à valider par audit terrain. Aucun chiffre n'est posé sans qualification de sa source.
 - Le document **dialogue avec les contre-arguments** légitimes (résistances opérationnelles, contraintes capital, conformité) avant de poser la cible.
 - Le découpage par capacités s'inspire du framework **DAMA-DMBOK** (référence du data management), avec adaptation au contexte météo.
-- Le document **assume ne pas connaître précisément** Météo-France ou tout autre opérateur : c'est un cadre **générique** à instancier après audit.
+- Le document **assume ne pas connaître précisément** l'opérateur national ou tout autre opérateur : c'est un cadre **générique** à instancier après audit.
 
 \newpage
 
@@ -67,7 +67,7 @@ Pour les choix techniques (composants OSS, stack, déploiement), se reporter au 
 
 ## 2.1 Avertissement
 
-Cette section formule des **hypothèses fondées sur des patterns publiquement décrits chez plusieurs opérateurs météo nationaux**. Elles ne constituent pas un audit de Météo-France. **Chaque hypothèse doit être confirmée ou infirmée** par mesure et entretiens avant tout investissement majeur.
+Cette section formule des **hypothèses fondées sur des patterns publiquement décrits chez plusieurs opérateurs météo nationaux**. Elles ne constituent pas un audit de l'opérateur national. **Chaque hypothèse doit être confirmée ou infirmée** par mesure et entretiens avant tout investissement majeur.
 
 ## 2.2 Liste des hypothèses
 
@@ -144,7 +144,7 @@ Sans cette reconnaissance, la cible est une posture, pas un programme.
 
 # 4. Apprentissages externes : ne pas réinventer
 
-Plusieurs initiatives publiques offrent un retour d'expérience exploitable. À analyser avant de poser la cible Météo-France.
+Plusieurs initiatives publiques offrent un retour d'expérience exploitable. À analyser avant de poser la cible de l'opérateur national.
 
 ## 4.1 ECMWF MARS (Meteorological Archival and Retrieval System)
 
@@ -234,9 +234,9 @@ La cible se mesure à ce qu'elle change pour les acteurs réels. Sept scénarios
 
 ## 5.4 Paul, dispatcher sécurité civile
 
-**Aujourd'hui.** Paul reçoit un signalement de feu de forêt en zone 31. Il le saisit dans le SI pompiers. La donnée arrive à Météo-France en CSV nocturne, H+18h plus tard, dans une chaîne d'enrichissement parallèle.
+**Aujourd'hui.** Paul reçoit un signalement de feu de forêt en zone 31. Il le saisit dans le SI pompiers. La donnée arrive à un opérateur national en CSV nocturne, H+18h plus tard, dans une chaîne d'enrichissement parallèle.
 
-**Avec la plateforme.** Paul saisit dans une DataWindow connectée à la plateforme. Validation supervisée en 5 minutes. La donnée alimente immédiatement les modèles de propagation, les alertes vigilance feu, le briefing préfecture. Latence saisie → utilisable : minutes.
+**Avec la plateforme.** Paul saisit dans une DataWindow connectée à la plateforme. Validation supervisée en 5 minutes. La donnée alimente immédiatement les modèles de propagation, les alertes vigilance feu, le briefing autorité locale. Latence saisie → utilisable : minutes.
 
 **Valeur** : réactivité opérationnelle, qualité de la décision préfectorale, retour d'expérience accéléré.
 
@@ -250,9 +250,9 @@ La cible se mesure à ce qu'elle change pour les acteurs réels. Sept scénarios
 
 ## 5.6 Vincent, ingénieur dataops
 
-**Aujourd'hui.** AROME en retard à 14h. Vincent l'apprend par un mail d'une équipe aval qui se plaint. Il diagnostique en 2h.
+**Aujourd'hui.** le modèle régional est en retard à 14h. Vincent l'apprend par un mail d'une équipe aval qui se plaint. Il diagnostique en 2h.
 
-**Avec la plateforme.** AROME en retard détecté à 13:45 (15 min après l'horaire SLA). Notification automatique. Cascade calculée : 14 secondaires bloqués, 38 produits dégradés. Cause identifiée : NOMADS source amont. Communication aux consumers automatisée. MTTD : 15 min, MTTR : maîtrisé.
+**Avec la plateforme.** le modèle régional est en retard détecté à 13:45 (15 min après l'horaire SLA). Notification automatique. Cascade calculée : 14 secondaires bloqués, 38 produits dégradés. Cause identifiée : NOMADS source amont. Communication aux consumers automatisée. MTTD : 15 min, MTTR : maîtrisé.
 
 **Valeur** : opérabilité, transparence vis-à-vis des consumers, réduction du stress ops.
 
@@ -640,7 +640,7 @@ Décision-clé : **la cible doit prouver qu'elle peut se retirer** d'un dataset 
 Document complémentaire `architecture_si_meteo.docx` (section 7) contient 78 questions classées en 13 axes. Quatre sont **préalables à tout démarrage** :
 
 1. **Sponsor exécutif identifié et engagé pour 3 ans minimum ?**
-2. **Cible (Météo-France seul, consortium européen, produit générique) ?**
+2. **Cible (l'opérateur national seul, consortium européen, produit générique) ?**
 3. **Budget pluri-annuel provisionné ?**
 4. **Équipe minimale viable identifiée et engagée ?**
 

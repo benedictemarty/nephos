@@ -158,7 +158,7 @@ Huit plateformes structurantes, représentatives des différentes approches :
 **Pertinence pour un opérateur national.**
 - Inspiration **forte** sur l'**adoption STAC** comme catalogue spatialisé.
 - Inspiration **forte** sur la **gouvernance de catalogue** moderne.
-- À considérer pour **interopérabilité** (STAC export du catalogue Météo-France).
+- À considérer pour **interopérabilité** (STAC export du catalogue l'opérateur national).
 
 ## 3.4 Copernicus Climate Data Store (CDS), Atmosphere Data Store (ADS), Emergency Management Service (CEMS)
 
@@ -190,7 +190,7 @@ Huit plateformes structurantes, représentatives des différentes approches :
 **Pertinence pour un opérateur national.**
 - Inspiration **forte** sur le **modèle API + compute partagé** comme service aux consumers.
 - Inspiration **moyenne** sur le catalogue (pattern à moderniser).
-- Possible **partenariat** plutôt que concurrence : Météo-France pourrait s'intégrer comme nœud Copernicus plutôt que de répliquer.
+- Possible **partenariat** plutôt que concurrence : l'opérateur national pourrait s'intégrer comme nœud Copernicus plutôt que de répliquer.
 
 ## 3.5 Pangeo
 
@@ -344,7 +344,7 @@ Huit plateformes structurantes, représentatives des différentes approches :
 | Earth Engine | Google US | Google | ❌ (US privé) |
 | AWS Open Data | AWS US | AWS | ❌ (US privé) |
 
-**Leçon** : pour une plateforme française ou européenne, les options souveraines sont **MARS, EUMETSAT DS, Copernicus, Pangeo**. Les autres impliquent dépendance hors UE.
+**Leçon** : pour une plateforme nationale ou européenne, les options souveraines sont **MARS, EUMETSAT DS, Copernicus, Pangeo**. Les autres impliquent dépendance hors UE.
 
 ## 4.3 Lock-in technologique
 
@@ -374,7 +374,7 @@ Huit plateformes structurantes, représentatives des différentes approches :
 | Earth Engine | Distribué interne | Très rapide | langage propriétaire |
 | AWS Open Data | Aucun | n/a | utilisateur paie |
 
-**Leçon** : le **compute intégré** est un facteur d'adoption fort. Copernicus, Planetary Computer, Earth Engine ont un avantage net. La cible française doit prévoir un compute partagé (Dask + Jupyter ou équivalent) dès le pilote.
+**Leçon** : le **compute intégré** est un facteur d'adoption fort. Copernicus, Planetary Computer, Earth Engine ont un avantage net. La cible nationale doit prévoir un compute partagé (Dask + Jupyter ou équivalent) dès le pilote.
 
 ## 4.5 Adoption tiers économique
 
@@ -389,7 +389,7 @@ Huit plateformes structurantes, représentatives des différentes approches :
 | Earth Engine | Très forte (télédétection) | Très forte (apps environnement) | Milliers d'apps |
 | AWS Open Data | Très forte | Très forte | Vitrine adoption |
 
-**Leçon** : l'**ouverture publique** (NOAA BDP, AWS Open Data, Earth Engine) génère plus d'innovation tiers que les modèles fermés. Une cible française devrait prévoir un **canal d'ouverture public** dès le pilote, en complément du back-office souverain.
+**Leçon** : l'**ouverture publique** (NOAA BDP, AWS Open Data, Earth Engine) génère plus d'innovation tiers que les modèles fermés. Une cible nationale devrait prévoir un **canal d'ouverture public** dès le pilote, en complément du back-office souverain.
 
 \newpage
 
@@ -431,11 +431,11 @@ Synthèse des patterns à reprendre, à adapter, à éviter.
 
 \newpage
 
-# 6. Quelle cible française au regard de ce benchmark ?
+# 6. Quelle cible nationale au regard de ce benchmark ?
 
 ## 6.1 Diagnostic synthétique
 
-Aucune des plateformes existantes n'est **directement réutilisable** comme cible française :
+Aucune des plateformes existantes n'est **directement réutilisable** comme cible nationale :
 
 - **MARS** : propriétaire ECMWF, non transposable.
 - **NOAA BDP / AWS Open Data** : modèles US, pas souverains, et c'est juste de la diffusion ouverte.
@@ -463,11 +463,11 @@ Aucune des plateformes existantes n'est **directement réutilisable** comme cibl
 2. **Diffusion ouverte sur cloud public** (modèle NOAA BDP) en complément du back-office souverain.
 3. **Contribution à Pangeo / STAC** pour ancrage communautaire et ouverture aux talents.
 
-## 6.3 Ce que la cible française peut apporter à l'écosystème
+## 6.3 Ce que la cible nationale peut apporter à l'écosystème
 
 Aucune plateforme actuelle ne combine :
 
-- Souveraineté française.
+- Souveraineté nationale.
 - Single source of truth à 3 niveaux.
 - Data contracts gouvernant techniques et métier ensemble.
 - Couverture météo complète (NWP + observations + satellite + climat + saisie).
@@ -501,7 +501,7 @@ Aucune plateforme existante n'est la cible. Mais l'ensemble du benchmark dessine
 - **Les partenariats à instruire** : Copernicus, Pangeo, EUMETSAT.
 - **Les pièges à éviter** : lock-in propriétaire, vocabulaire custom, plateforme isolée sans communauté, ouverture sans gouvernance interne.
 
-La cible française a une **position défendable** : combiner souveraineté + gouvernance par construction + interopérabilité par standards + ouverture mesurée + compute partagé. Cette combinaison n'existe pas aujourd'hui. C'est une opportunité.
+La cible nationale a une **position défendable** : combiner souveraineté + gouvernance par construction + interopérabilité par standards + ouverture mesurée + compute partagé. Cette combinaison n'existe pas aujourd'hui. C'est une opportunité.
 
 ---
 
