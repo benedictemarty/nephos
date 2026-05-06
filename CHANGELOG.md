@@ -7,6 +7,23 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ## [Non publié]
 
+### Réorganisé
+
+- **Réalignement stratégique du projet** : Nephos est désormais positionné comme **couche sémantique** d'une **plateforme SI météo gouvernée Po-scale** dont la vision est formalisée dans `docs/architecture/`.
+  - Nouveau dossier `docs/architecture/` regroupant 4 documents de cadrage stratégique : architecture technique (`architecture_si_meteo.md`, ~35 pages, 8 annexes opérationnelles), architecture fonctionnelle v2 avec auto-critique intégrée (`architecture_fonctionnelle_si_meteo.md`, ~22 pages : capacités DAMA-aligned, business case avec ordres de grandeur conservateurs, scénarios métier concrets, stratégie de transition strangler pattern, dialogue avec contre-arguments), benchmark de 8 plateformes existantes (`benchmark_plateformes_meteo.md`, ~16 pages : MARS, NOAA BDP, EUMETSAT Data Store, Copernicus CDS/ADS, Pangeo, Microsoft Planetary Computer, Google Earth Engine, AWS Open Data Program), cartographie des SI internes des services météo nationaux (`sin_internes_smn.md`, ~14 pages : Météo-France, ECMWF, DWD, MetOffice, NOAA, JMA, BOM, KNMI, MeteoSwiss, KMA, plus composants partagés NinJo, ALADIN/ACCORD, Unified Model, ecCodes, OpenIFS).
+  - Versions `.docx` générées dans `docs/architecture/docx/` via pandoc.
+  - `docs/architecture/README.md` guide de lecture des 4 documents.
+- **README.md** racine : encart d'évolution stratégique pointant vers `docs/architecture/`. Documentation existante (ADR, BACKLOG, CHANGELOG) préservée.
+- **CLAUDE.md** : réécriture pour refléter la position de Nephos comme couche sémantique de la cible plateforme. Distinction claire entre code merged (couche sémantique) et couches à construire (catalogue Iceberg, stockage Zarr, orchestration Dagster/Kestra, gouvernance contracts, alerting, fraîcheur, complétude, accès classifiés). Conventions à respecter quand on étend vers la cible.
+- **BACKLOG.md** : ajout d'un encart de réalignement (10 EPICs existants conservés, position dans la cible explicitée) et de **9 nouveaux EPICs** (E11-E19) couvrant les couches manquantes pour la cible : catalogue technique Iceberg + Lakekeeper (E11), stockage objet + Zarr (E12), orchestration Dagster ou Kestra (E13), data contracts gouvernance (E14), alerting métier (E15), fraîcheur SLA + complétude (E16), habilitations classifiées L0-L3 (E17), saisie opérateur DataWindow (E18), modifications append-only event sourcing (E19). Démarrage des EPICs E11-E19 conditionné aux décisions de cadrage (sponsor, scope, budget, équipe).
+- **ADRs futurs identifiés** : 12 nouveaux ADRs (0006 à 0019, listés en section 9 du document technique) à rédiger après confirmation cadrage. Noms et numéros stabilisés.
+
+### Limites assumées
+
+- Les documents d'architecture sont des **drafts** soumis à critique structurante. Limites explicites signalées : hypothèses sur l'existant à valider en audit, chiffres en ordres de grandeur, pas de relecture juridique.
+- Les EPICs E11-E19 ne démarrent **pas immédiatement** : ils attendent décisions de cadrage.
+- **Aucun changement de code applicatif** dans cette PR : c'est un réalignement de documentation et de backlog. Le code existant (152 tests verts) reste fonctionnel et continue de couvrir la couche sémantique.
+
 ### Ajouté
 
 - **Trigger d'audit étendu** (E2-04) — `gov.audit_trigger_func` est désormais attaché à 10 tables au total (3 préexistantes : `scheme`, `concept`, `unite` ; 7 nouvelles : `concept_label`, `concept_note`, `concept_in_scheme`, `concept_semantic_relation`, `concept_mapping`, `concept_physical`, `gov.proposals`).

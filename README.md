@@ -2,6 +2,8 @@
 
 > Référentiel SKOS de métadonnées météorologiques. Vocabulaires alignés sur CF Conventions, WMO Codes Registry et QUDT.
 
+> **📌 Évolution stratégique (2026-05).** Nephos est désormais positionné comme **couche sémantique** d'une **plateforme SI météo gouvernée Po-scale** dont la vision est formalisée dans [`docs/architecture/`](docs/architecture/). Le code et le schéma SQL existants couvrent la couche sémantique ; les couches catalogue technique (Iceberg), stockage objet (Zarr/Parquet), orchestration (Dagster ou Kestra), gouvernance par data contracts, alerting, fraîcheur SLA, complétude, accès classifiés restent à construire. Voir [`docs/architecture/README.md`](docs/architecture/README.md) pour la lecture guidée des 4 documents de cadrage.
+
 [![Code License: Apache 2.0](https://img.shields.io/badge/code%20license-Apache%202.0-blue.svg)](LICENSE)
 [![Data License: CC BY 4.0](https://img.shields.io/badge/data%20license-CC%20BY%204.0-lightgrey.svg)](DATA_LICENSE)
 [![Status: bootstrap](https://img.shields.io/badge/status-bootstrap-yellow.svg)](#état-actuel)
@@ -136,7 +138,8 @@ Voir l'en-tête commenté de `schema_v4_skos.sql` pour la lecture détaillée.
 
 | Document | Rôle |
 |---|---|
-| [BACKLOG.md](BACKLOG.md) | Backlog projet en 10 EPICs, priorités, sprints candidats |
+| [docs/architecture/](docs/architecture/) | **Vision plateforme cible** : 4 documents de cadrage stratégique (technique, fonctionnel, benchmark, SI internes SMN) |
+| [BACKLOG.md](BACKLOG.md) | Backlog projet en EPICs, priorités, sprints candidats — réaligné sur la cible plateforme |
 | [CHANGELOG.md](CHANGELOG.md) | Journal des modifications (Keep a Changelog 1.1.0) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Workflow de contribution, chaîne de revue agentique + humaine, conventions |
 | [docs/adr/](docs/adr/) | Architecture Decision Records (format MADR) |
