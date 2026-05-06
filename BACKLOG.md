@@ -1,6 +1,51 @@
 # Backlog — Nephos
 
-Référentiel SKOS de métadonnées météorologiques. Voir [ADR 0001](docs/adr/0001-adopter-skos-comme-socle-du-referentiel.md) (SKOS) et [ADR 0002](docs/adr/0002-python-comme-stack-dimplementation.md) (Python).
+**Nephos** est le **nom du programme** d'une plateforme SI météo gouvernée Po-scale. Le programme se compose de plusieurs **briques techniques nommées** :
+
+```
+Nephos (programme)
+├── Nephos Vocab       — couche sémantique (SKOS + CF + QUDT + WMO + ECMWF)  ← existe
+├── Nephos Catalog     — catalogue technique Iceberg + Lakekeeper             📋 E11
+├── Nephos Storage     — stockage objet MinIO/Ceph + Zarr / Parquet            📋 E12
+├── Nephos Workflow    — orchestration Dagster ou Kestra                       📋 E13
+├── Nephos Contracts   — data contracts versionnés en Git                      📋 E14
+├── Nephos Watch       — alerting métier + fraîcheur SLA + complétude          📋 E15-E16
+├── Nephos Vault       — habilitations + classifications L0-L3 (ABAC)          📋 E17
+├── Nephos Capture     — saisie opérateur (DataWindow)                         📋 E18
+└── Nephos Trace       — modifications append-only event sourcing              📋 E19
+```
+
+Chaque sous-marque désigne **l'intégration et la gouvernance** d'une couche. Les briques OSS sous-jacentes (Iceberg, Lakekeeper, Dagster, Kestra, OPA, etc.) gardent leurs noms d'origine. Nephos est l'**intégrateur**, pas un fork.
+
+Vision détaillée dans [`docs/architecture/`](docs/architecture/).
+
+Voir [ADR 0001](docs/adr/0001-adopter-skos-comme-socle-du-referentiel.md) (SKOS) et [ADR 0002](docs/adr/0002-python-comme-stack-dimplementation.md) (Python) pour le socle de Nephos Vocab. ADRs 0006 à 0019 (autres composants) à rédiger après confirmation sponsor / scope / budget / équipe.
+
+## Réalignement (2026-05)
+
+| EPIC | Statut | Composant Nephos |
+|------|--------|------------------|
+| E1 — Gouvernance architecturale et documentaire | ✅ majoritairement fait | Programme global |
+| E2 — Refonte schéma SQL SKOS | ✅ fait | **Nephos Vocab** |
+| E3 — Bootstrap projet Python | ✅ fait | **Nephos Vocab** (socle applicatif) |
+| E4 — Pipeline d'import sources standards | ✅ majoritairement fait | **Nephos Vocab** (acquisition sémantique) |
+| E5 — Validation et qualité sémantique | ✅ fait | **Nephos Vocab** (qualité sémantique) |
+| E6 — Export et interopérabilité | ✅ partiellement | **Nephos Vocab** (diffusion sémantique) |
+| E7 — Façade API | 📋 ouvert | **Nephos Vocab** (API service) |
+| E8 — Curation et publication | 📋 ouvert | **Nephos Vocab** (curation) |
+| E9 — Opération et observabilité | 📋 ouvert | **Nephos Vocab** (observabilité interne) |
+| E10 — Outils de validation de fichiers | 📋 ouvert | **Nephos Vocab** (consumers de la sémantique) |
+| **E11 — Nephos Catalog (Iceberg + Lakekeeper)** | 📋 nouveau | Capacité « Cataloguer » + « Stocker » |
+| **E12 — Nephos Storage (objet + Zarr gridded)** | 📋 nouveau | Capacité « Stocker » (gridded Po-scale) |
+| **E13 — Nephos Workflow (Dagster ou Kestra)** | 📋 nouveau | Capacités « Acquérir » + « Calculer » + « Évoluer » |
+| **E14 — Nephos Contracts (gouvernance)** | 📋 nouveau | Capacité « Gouverner » transverse |
+| **E15 — Nephos Watch (alerting métier — annexe A)** | 📋 nouveau | Capacité « Surveiller » + service consumer |
+| **E16 — Nephos Watch (fraîcheur + complétude — annexes B, C)** | 📋 nouveau | Capacité « Surveiller » |
+| **E17 — Nephos Vault (habilitations L0-L3 — annexe H)** | 📋 nouveau | Capacité « Habiliter » |
+| **E18 — Nephos Capture (saisie opérateur — annexe F)** | 📋 nouveau | Capacité « Saisir » |
+| **E19 — Nephos Trace (modifications append-only — annexe G)** | 📋 nouveau | Capacité « Évoluer » + traçabilité |
+
+EPICs E11-E19 ne démarrent qu'après **décisions de cadrage** (sponsor, scope, budget, équipe).
 
 ## Conventions
 
@@ -222,6 +267,148 @@ Indicateurs de fin de sprint :
 - ADR 0003 et 0004 acceptés.
 - `schema_v4_skos.sql` versionné, applicable à blanc, tests d'intégrité verts.
 - `nephos --help` fonctionnel (commandes vides) avec CI verte sur `main`.
+
+---
+
+## EPIC 11 — Nephos Catalog (Iceberg + Lakekeeper)
+
+Introduction du catalogue technique, fondation du data lakehouse cible. À démarrer après confirmation sponsor / scope / budget / équipe.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E11-01 | ADR 0008 — Choix Iceberg + Lakekeeper comme catalogue technique de référence | **P0** | S | Cadrage | 📋 |
+| E11-02 | Déploiement Lakekeeper en local Docker compose pour POC | **P0** | M | E11-01 | 📋 |
+| E11-03 | Premier dataset Iceberg : ingestion observation tabulaire (METAR ou SYNOP) | **P0** | M | E11-02 | 📋 |
+| E11-04 | Lien Postgres `vocab.concept` ↔ Iceberg table column metadata (FK URI) | **P0** | M | E11-03 | 📋 |
+| E11-05 | API REST `/catalog/datasets` : recherche par concept Nephos ou attribut technique | P1 | M | E11-04 | 📋 |
+| E11-06 | Export du catalogue Iceberg en STAC (interopérabilité communautaire) | P2 | M | E11-04 | 📋 |
+| E11-07 | Tests d'intégration end-to-end : ingestion → catalogue → lecture DuckDB | **P0** | M | E11-03 | 📋 |
+
+---
+
+## EPIC 12 — Nephos Storage (objet + Zarr gridded)
+
+Introduction du stockage objet et du format Zarr v3 pour les données gridded. À démarrer après E11.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E12-01 | ADR 0009 — Format pivot Zarr v3 pour gridded météo, justification vs alternatives | **P0** | S | E11-01 | 📋 |
+| E12-02 | Déploiement MinIO en local Docker compose, configuration buckets par classification | **P0** | S | E11-01 | 📋 |
+| E12-03 | Premier dataset Zarr : conversion d'un GFS GRIB vers Zarr (recette versionnée) | **P0** | M | E12-02 | 📋 |
+| E12-04 | Lecture Zarr via xarray + DuckDB intégrée à l'API résolveur | **P0** | M | E12-03 | 📋 |
+| E12-05 | Politique de chunking optimisée par usage (lat/lon vs time-series) | P1 | M | E12-03 | 📋 |
+| E12-06 | Cycle de vie hot/warm/cold/frozen via lifecycle policies S3 | P1 | M | E12-02 | 📋 |
+| E12-07 | Plan de retrieval frozen testé annuellement | P1 | S | E12-06 | 📋 |
+
+---
+
+## EPIC 13 — Nephos Workflow (Dagster ou Kestra)
+
+Couche orchestration unifiant les 3 modes de déclenchement (heure, ressource, pivot). Choix Dagster ou Kestra à trancher.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E13-01 | ADR 0010 — Choix orchestrateur : Dagster vs Kestra. Argument souveraineté à arbitrer | **P0** | S | Cadrage | 📋 |
+| E13-02 | Déploiement orchestrateur retenu en local Docker compose | **P0** | S | E13-01 | 📋 |
+| E13-03 | Asset/flow pour ingestion GFS NOMADS (mode schedule) | **P0** | M | E13-02, E11-03 | 📋 |
+| E13-04 | Sensor sur commit Iceberg pour cascade downstream automatique (mode ressource) | **P0** | M | E13-03 | 📋 |
+| E13-05 | Auto-materialize sur changement de recette ou de concept (mode pivot) | P1 | M | E13-04 | 📋 |
+| E13-06 | Bridge SLURM optionnel pour jobs HPC | P2 | L | E13-02 | 📋 |
+| E13-07 | Migration des cron / scripts ad-hoc legacy vers orchestrateur unifié | P1 | L | E13-02 | 📋 |
+
+---
+
+## EPIC 14 — Nephos Contracts (gouvernance par construction)
+
+Generalisation du modèle data contract YAML versionné à toute publication. Validation CI bloquante.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E14-01 | ADR 0011 — Format de data contract YAML : schéma technique + sens métier + qualité + SLA + owner + politique d'accès | **P0** | M | E11-04 | 📋 |
+| E14-02 | Validation de contract en CI : schéma cohérent, concept Nephos existant, règles qualité exécutables | **P0** | M | E14-01 | 📋 |
+| E14-03 | Premier data contract pilote sur dataset Iceberg de E11-03 | **P0** | S | E14-01 | 📋 |
+| E14-04 | Politique de versioning des contracts (compatibilité ascendante) | P1 | M | E14-01 | 📋 |
+| E14-05 | UI / CLI de découverte des contracts | P1 | S | E14-03 | 📋 |
+| E14-06 | Reporting d'écarts contract / réalité (audit semestriel automatisé) | P2 | M | E14-03 | 📋 |
+
+---
+
+## EPIC 15 — Nephos Watch (alerting métier)
+
+Cf. annexe A du document technique. Alert contracts versionnés + state machine + notifier découplé.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E15-01 | ADR 0012 — Modèle alert contract YAML, state machine open/acknowledged/resolved/silenced | P1 | S | E14-01 | 📋 |
+| E15-02 | Premier alert contract pilote (par exemple vent fort) avec évaluation Dagster sensor | P1 | M | E15-01, E13-04 | 📋 |
+| E15-03 | Service notifier (FastAPI) avec canaux email / webhook | P1 | M | E15-02 | 📋 |
+| E15-04 | UI consultation alertes ouvertes + historique (Streamlit) | P1 | S | E15-03 | 📋 |
+| E15-05 | Workflow d'acquittement (validation 2-yeux pour alertes critiques) | P1 | M | E15-03 | 📋 |
+| E15-06 | Distinction alerting plateforme (Grafana) vs alerting métier (plateforme) | P0 | XS | E15-01 | 📋 |
+
+---
+
+## EPIC 16 — Nephos Watch (fraîcheur SLA + complétude)
+
+Cf. annexes B et C du document technique.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E16-01 | ADR 0013 — Modèle freshness policy : expected_publication, freshness_sla, on_late_data | P1 | S | E14-01 | 📋 |
+| E16-02 | État de fraîcheur gouverné en Iceberg `platform.dataset_freshness_state` | P1 | M | E16-01 | 📋 |
+| E16-03 | Cascade SLA : retard primaire propagé aux secondaires/produits | P1 | M | E16-02 | 📋 |
+| E16-04 | ADR 0014 — Manifeste de complétude : mandatory vs optional, on_partial | P1 | S | E14-01 | 📋 |
+| E16-05 | Détection complétude à l'arrivée du dataset (pygrib / Zarr metadata) | P1 | M | E16-04 | 📋 |
+| E16-06 | Lineage column-level pour cascade fine sur dataset partial | P2 | L | E16-05 | 📋 |
+| E16-07 | Reporting de ponctualité et complétude par dataset | P1 | M | E16-02, E16-05 | 📋 |
+
+---
+
+## EPIC 17 — Nephos Vault (habilitations L0-L3)
+
+Cf. annexe H du document technique. Aviation, marine, défense, RGPD, embargos.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E17-01 | ADR 0015 — Classifications L0/L1/L2/L3, ABAC OPA, isolation physique L3 | **P0** | M | Cadrage juridique | 📋 |
+| E17-02 | Déploiement Keycloak (IDP fédéré) | P1 | M | E17-01 | 📋 |
+| E17-03 | Déploiement OPA + intégration Lakekeeper policies | P1 | M | E17-02 | 📋 |
+| E17-04 | Premier access contract pilote sur dataset L1 (aviation par exemple) | P1 | M | E17-03 | 📋 |
+| E17-05 | Audit d'accès gouverné en Iceberg `platform.access_log` | P1 | M | E17-03 | 📋 |
+| E17-06 | Tests de fuite par recoupement (red team interne) | P1 | S | E17-04 | 📋 |
+| E17-07 | Plateforme jumelle L3 défense (architecture isolée) | P2 | XL | E17-01 | 📋 |
+
+---
+
+## EPIC 18 — Nephos Capture (saisie opérateur DataWindow)
+
+Cf. annexe F du document technique. Observations terrain (feux, dégâts, niveau d'eau) saisies dans la plateforme.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E18-01 | ADR 0016 — DataWindow générée depuis data contract + JSON Schema | P1 | M | E14-01 | 📋 |
+| E18-02 | Génération automatique du formulaire React JSON Schema Form depuis le contract | P1 | M | E18-01 | 📋 |
+| E18-03 | Backend API saisie (FastAPI + Pydantic dérivé) | P1 | M | E18-01 | 📋 |
+| E18-04 | Premier workflow pilote : saisie feux de forêt | P1 | M | E18-02, E18-03 | 📋 |
+| E18-05 | Mode offline + sync (app mobile) | P2 | L | E18-04 | 📋 |
+| E18-06 | Pièces jointes (photos) avec URN S3 + lifecycle distinct | P2 | M | E18-04 | 📋 |
+| E18-07 | Anonymisation RGPD à la lecture (visages, plaques, géoloc) | P1 | M | E17-04 | 📋 |
+
+---
+
+## EPIC 19 — Nephos Trace (modifications append-only event sourcing)
+
+Cf. annexe G du document technique. Aucune modification par UPDATE direct, append-only avec lineage et cascade.
+
+| ID | Titre | P | Taille | Dépend | État |
+|----|-------|---|--------|--------|------|
+| E19-01 | ADR 0017 — Event sourcing append-only : 5 types (correction, validation, override, retract, flag) | **P0** | M | E14-01 | 📋 |
+| E19-02 | Schéma Iceberg `obs.*.events` append-only + vue `current` matérialisée | P1 | M | E19-01 | 📋 |
+| E19-03 | Workflow validation 2-yeux pour modifications critiques | P1 | M | E19-02 | 📋 |
+| E19-04 | Cascade downstream automatique sur correction (auto-materialize) | P1 | M | E19-02, E13-05 | 📋 |
+| E19-05 | Diffusion event de correction publique (METAR COR, webhook) | P1 | M | E19-02 | 📋 |
+| E19-06 | Audit UI consultation chaîne de versions | P2 | M | E19-02 | 📋 |
+| E19-07 | Bloquer accès SQL direct (lecture seule humains, IDE révoqué) | P1 | S | E19-01 | 📋 |
 
 ---
 

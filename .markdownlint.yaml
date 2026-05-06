@@ -20,3 +20,19 @@ MD034: false
 
 # Pas d'emphasis utilisé comme heading : on a quelques cas légitimes.
 MD036: false
+
+# Listes entourées de lignes vides : toléré dans les docs d'architecture
+# où les listes suivent un texte introductif sans saut de ligne.
+MD032: false
+
+# Lignes vides dans les blockquotes : toléré pour séparer proprement
+# deux blockquotes consécutifs (README, docs vision).
+MD028: false
+
+# Titres entourés de lignes vides : toléré dans les docs d'architecture
+# longs où certains titres sont suivis directement de leur contenu inline.
+MD022: false
+
+# Préfixe de liste ordonnée : toléré (numérotation continue cross-section
+# dans les docs vision pour les questions à challenger Q1-Q78).
+MD029: false
