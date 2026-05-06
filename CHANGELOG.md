@@ -9,7 +9,18 @@ et ce projet adhère au [versionnement sémantique](https://semver.org/lang/fr/)
 
 ### Réorganisé
 
-- **Réalignement stratégique du projet** : Nephos est désormais positionné comme **couche sémantique** d'une **plateforme SI météo gouvernée Po-scale** dont la vision est formalisée dans `docs/architecture/`.
+- **Taxonomie Nephos** (option C) : Nephos devient le **nom du programme global** ; ses **briques techniques** ont des noms propres qui désignent l'intégration et la gouvernance d'une couche, sans renommer les outils OSS sous-jacents.
+  - **Nephos Vocab** : couche sémantique SKOS (en place, code et schéma actuels).
+  - **Nephos Catalog** : catalogue technique Iceberg + Lakekeeper (E11).
+  - **Nephos Storage** : stockage objet + Zarr / Parquet (E12).
+  - **Nephos Workflow** : orchestration Dagster ou Kestra (E13).
+  - **Nephos Contracts** : data contracts versionnés (E14).
+  - **Nephos Watch** : alerting + fraîcheur + complétude (E15-E16).
+  - **Nephos Vault** : habilitations + classifications L0-L3 (E17).
+  - **Nephos Capture** : saisie opérateur DataWindow (E18).
+  - **Nephos Trace** : modifications append-only (E19).
+  - Mise à jour des README (racine + docs/architecture/), du BACKLOG (EPICs E11-E19 renommés), du document technique (section 4.0 ajoutée pour la taxonomie). ADR justificatif à rédiger dans une PR ultérieure.
+- **Réalignement stratégique du projet** (commit précédent) : Nephos est désormais positionné comme **couche sémantique** d'une **plateforme SI météo gouvernée Po-scale** dont la vision est formalisée dans `docs/architecture/`.
   - Nouveau dossier `docs/architecture/` regroupant 4 documents de cadrage stratégique : architecture technique (`architecture_si_meteo.md`, ~35 pages, 8 annexes opérationnelles), architecture fonctionnelle v2 avec auto-critique intégrée (`architecture_fonctionnelle_si_meteo.md`, ~22 pages : capacités DAMA-aligned, business case avec ordres de grandeur conservateurs, scénarios métier concrets, stratégie de transition strangler pattern, dialogue avec contre-arguments), benchmark de 8 plateformes existantes (`benchmark_plateformes_meteo.md`, ~16 pages : MARS, NOAA BDP, EUMETSAT Data Store, Copernicus CDS/ADS, Pangeo, Microsoft Planetary Computer, Google Earth Engine, AWS Open Data Program), cartographie des SI internes des services météo nationaux (`sin_internes_smn.md`, ~14 pages : l'opérateur national, ECMWF, DWD, MetOffice, NOAA, JMA, BOM, KNMI, MeteoSwiss, KMA, plus composants partagés NinJo, ALADIN/ACCORD, Unified Model, ecCodes, OpenIFS).
   - Versions `.docx` générées dans `docs/architecture/docx/` via pandoc.
   - `docs/architecture/README.md` guide de lecture des 4 documents.

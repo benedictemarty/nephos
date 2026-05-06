@@ -1,8 +1,8 @@
 # Nephos
 
-> Référentiel SKOS de métadonnées météorologiques. Vocabulaires alignés sur CF Conventions, WMO Codes Registry et QUDT.
+> **Programme** d'une plateforme SI météo gouvernée Po-scale, composé de plusieurs briques nommées dont la première (**Nephos Vocab**) est en place : référentiel SKOS de métadonnées météorologiques, vocabulaires alignés sur CF Conventions, WMO Codes Registry, QUDT et ECMWF.
 
-> **📌 Évolution stratégique (2026-05).** Nephos est désormais positionné comme **couche sémantique** d'une **plateforme SI météo gouvernée Po-scale** dont la vision est formalisée dans [`docs/architecture/`](docs/architecture/). Le code et le schéma SQL existants couvrent la couche sémantique ; les couches catalogue technique (Iceberg), stockage objet (Zarr/Parquet), orchestration (Dagster ou Kestra), gouvernance par data contracts, alerting, fraîcheur SLA, complétude, accès classifiés restent à construire. Voir [`docs/architecture/README.md`](docs/architecture/README.md) pour la lecture guidée des 4 documents de cadrage.
+> **📌 Évolution stratégique (2026-05).** Nephos est désormais le **nom du programme global** d'une plateforme cible. Le programme se décompose en briques : **Nephos Vocab** (sémantique, en place) · **Nephos Catalog** (Iceberg + Lakekeeper) · **Nephos Storage** (MinIO/Ceph + Zarr) · **Nephos Workflow** (Dagster ou Kestra) · **Nephos Contracts** (data contracts) · **Nephos Watch** (alerting + fraîcheur + complétude) · **Nephos Vault** (habilitations + classifications L0-L3) · **Nephos Capture** (saisie opérateur) · **Nephos Trace** (modifications append-only). Le code et le schéma SQL existants couvrent **Nephos Vocab** ; les autres briques restent à construire. Vision détaillée dans [`docs/architecture/`](docs/architecture/).
 
 [![Code License: Apache 2.0](https://img.shields.io/badge/code%20license-Apache%202.0-blue.svg)](LICENSE)
 [![Data License: CC BY 4.0](https://img.shields.io/badge/data%20license-CC%20BY%204.0-lightgrey.svg)](DATA_LICENSE)

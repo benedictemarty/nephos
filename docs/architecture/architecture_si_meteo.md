@@ -149,6 +149,26 @@ Sans contract, pas de publication. Le contract est le pivot entre couches techni
 
 # 4. Stack technique de référence (open source uniquement)
 
+## 4.0 — Taxonomie Nephos
+
+Nephos est le **nom du programme**. Ses **briques techniques** ont des noms propres qui désignent **l'intégration et la gouvernance** d'une couche, **sans réimplémenter** les outils OSS sous-jacents qui gardent leurs noms d'origine.
+
+| Brique Nephos | Couche fonctionnelle | Briques OSS sous-jacentes |
+|---|---|---|
+| **Nephos Vocab** | Glossaire sémantique (SKOS) + mappings | rdflib + pyshacl + skosify + Postgres |
+| **Nephos Catalog** | Catalogue technique (schémas, snapshots, partitions) | Apache Iceberg + Lakekeeper |
+| **Nephos Storage** | Stockage objet + formats gridded / tabulaire | MinIO / Ceph + Zarr v3 + Parquet |
+| **Nephos Workflow** | Orchestration (3 modes : heure, ressource, pivot) | Dagster ou Kestra (à arbitrer) |
+| **Nephos Contracts** | Data contracts gouvernés (technique + métier + qualité + SLA + accès) | YAML + Git + CI + Pydantic |
+| **Nephos Watch** | Alerting métier + fraîcheur SLA + complétude | Sensors orchestrateur + Soda Core + Iceberg events |
+| **Nephos Vault** | Habilitations + classifications L0-L3 + audit | Keycloak + OPA + Vault KMS |
+| **Nephos Capture** | Saisie opérateur (DataWindow générée du contract) | FastAPI + JSON Schema + Streamlit/NiceGUI |
+| **Nephos Trace** | Modifications append-only (event sourcing, cascade) | Iceberg append-only + Postgres `current` view |
+
+Cette taxonomie permet : **adoption modulaire** (un acteur peut adopter Nephos Vocab seul), **évolution indépendante** de chaque brique, **owners clairs** (un nom = une équipe = une responsabilité), **substitution technique** sans renommage (remplacer Dagster par Kestra reste cohérent — Nephos Workflow garde son nom).
+
+## 4.1 — Stack par brique
+
 | Couche fonctionnelle | Composant retenu | Justification |
 |---|---|---|
 | Object store | **MinIO** (POC) → **Ceph / S3** (prod) | Standard S3, déployable seul |

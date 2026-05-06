@@ -1,12 +1,31 @@
-# Architecture — Plateforme SI Météo Gouvernée
+# Architecture — Programme Nephos (Plateforme SI Météo Gouvernée)
 
-Ce dossier contient les documents de **vision stratégique** d'une plateforme SI météo cible. Ils ont été produits collectivement et structurent la **réorientation du projet Nephos** comme couche sémantique de cette plateforme cible.
+Ce dossier contient les documents de **vision stratégique** du **programme Nephos**, plateforme SI météo gouvernée Po-scale.
 
-## Pourquoi cette réorientation
+## Taxonomie Nephos
 
-Le projet Nephos a démarré comme **référentiel SKOS** des grandeurs météo (CF + QUDT + WMO + ECMWF). Cette mission reste valide et les 19 PR mergées sont préservées.
+Nephos est un **programme** composé de plusieurs **briques techniques** :
 
-Mais le sens du projet a évolué : Nephos n'est pas une fin en soi. C'est la **couche sémantique** d'une plateforme plus large dont l'enjeu est de résoudre les problèmes structurels des opérateurs météo nationaux (réplications, gouvernance, scalabilité au pétaoctet).
+```
+Nephos (programme)
+├── Nephos Vocab       — couche sémantique (SKOS + CF + QUDT + WMO + ECMWF)  ✅ en place
+├── Nephos Catalog     — catalogue technique Iceberg + Lakekeeper             📋 à construire
+├── Nephos Storage     — stockage objet MinIO/Ceph + Zarr / Parquet            📋 à construire
+├── Nephos Workflow    — orchestration Dagster ou Kestra                       📋 à construire
+├── Nephos Contracts   — data contracts versionnés en Git                      📋 à construire
+├── Nephos Watch       — alerting métier + fraîcheur SLA + complétude          📋 à construire
+├── Nephos Vault       — habilitations + classifications L0-L3 (ABAC)          📋 à construire
+├── Nephos Capture     — saisie opérateur (DataWindow)                         📋 à construire
+└── Nephos Trace       — modifications append-only event sourcing              📋 à construire
+```
+
+Chaque sous-marque désigne **l'intégration et la gouvernance** d'une couche, pas une réimplémentation des briques OSS sous-jacentes (Iceberg, Lakekeeper, Dagster, Kestra, OPA, etc.) qui gardent leurs noms d'origine. Nephos est l'**intégrateur**, pas un fork.
+
+## Historique
+
+Le projet a démarré comme **référentiel SKOS** des grandeurs météo. Ce composant est devenu **Nephos Vocab** dans la taxonomie actuelle. Toutes les PR mergées (19 au moment de la réorientation, 152 tests verts) sont préservées et continuent de couvrir Nephos Vocab.
+
+Le sens du projet a évolué : Nephos n'est plus seulement un référentiel, c'est une **plateforme** dont la sémantique est l'une des briques.
 
 Les quatre documents ci-dessous formalisent cette vision élargie.
 
@@ -28,18 +47,20 @@ Versions `.docx` générées dans [`docx/`](docx/) (générées via `pandoc`).
 3. **Document technique** — pour comprendre l'architecture, les principes, les annexes opérationnelles.
 4. **Benchmark** + **SI internes** — pour situer la cible dans l'écosystème mondial.
 
-## Position de Nephos dans la cible
+## État des briques Nephos
 
-Dans l'architecture cible décrite, Nephos couvre **une couche** : la **couche sémantique** (glossaire métier, mappings inter-encodings CF / GRIB / BUFR / ECMWF / WMO).
-
-Les autres couches restent à construire :
-
-- **Catalogue technique** (Iceberg + Lakekeeper) : pas encore amorcé.
-- **Stockage objet** (MinIO / Ceph + Zarr / Parquet) : pas encore amorcé.
-- **Orchestration** (Dagster ou Kestra) : pas encore amorcé.
-- **Compute** (DuckDB + xarray + Dask) : pas encore amorcé.
-- **Service de résolution sémantique** : esquissé dans le code Nephos, à étendre.
-- **Gouvernance** (data contracts, alerting, fraîcheur, complétude, modifications, accès) : conceptualisée dans les documents, à implémenter.
+| Brique | État | Référence |
+|---|---|---|
+| **Nephos Vocab** | ✅ en place — code Python + schéma SQL + 152 tests verts | `src/nephos/`, `schema_v4_skos.sql`, ADR 0001-0014 |
+| **Nephos Catalog** | 📋 à construire | EPIC E11 du backlog |
+| **Nephos Storage** | 📋 à construire | EPIC E12 |
+| **Nephos Workflow** | 📋 à construire | EPIC E13 |
+| **Nephos Contracts** | 📋 à construire | EPIC E14 |
+| **Nephos Watch** (alerting) | 📋 à construire | EPIC E15, annexe A du document technique |
+| **Nephos Watch** (fraîcheur + complétude) | 📋 à construire | EPIC E16, annexes B et C |
+| **Nephos Vault** | 📋 à construire | EPIC E17, annexe H |
+| **Nephos Capture** | 📋 à construire | EPIC E18, annexe F |
+| **Nephos Trace** | 📋 à construire | EPIC E19, annexe G |
 
 ## État de validation
 
